@@ -377,10 +377,7 @@ parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
 parameter
- : 'let'?  external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
- | 'var'   external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
- | 'inout' external_parameter_name? local_parameter_name type_annotation
- |         external_parameter_name? local_parameter_name type_annotation range_operator
+ : external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
@@ -416,7 +413,9 @@ struct_body : '{' declarations?'}'  ;
 // GRAMMAR OF A CLASS DECLARATION
 
 class_declaration
- : attributes? access_level_modifier? 'class' class_name
+ : attributes? access_level_modifier? 'final'? 'class' class_name
+   generic_parameter_clause? type_inheritance_clause? class_body
+ | attributes? 'final' access_level_modifier? 'class' class_name
    generic_parameter_clause? type_inheritance_clause? class_body
  ;
 class_name : identifier ;
@@ -658,7 +657,8 @@ literal_expression
  : literal
  | array_literal
  | dictionary_literal
- | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'
+ | playground_literal
+ | '#file' | '#line' | '#cloumn' | '#function'
  ;
 
 array_literal			 : '[' array_literal_items? ']'  ;
@@ -667,6 +667,12 @@ array_literal_item       : expression ;
 dictionary_literal		 : '[' dictionary_literal_items ']' | '[' ':' ']'  ;
 dictionary_literal_items : dictionary_literal_item (',' dictionary_literal_item)* ','? ;
 dictionary_literal_item  : expression ':' expression  ;
+playground_literal
+  : '#colorLiteral' '(' 'red' ':'  expression ',' 'green' ':' expression ',' 'blue' ':' expression ',' 'alpha' ':' expression ')'
+  | '#fileLiteral' '(' 'resourceName' ':' expression ')'
+  | '#imageLiteral' '(' 'resourceName' ':' expression ')'
+  ;
+
 
 // GRAMMAR OF A SELF EXPRESSION
 
@@ -729,7 +735,7 @@ postfix_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
  | postfix_expression '.' 'init' '(' argument_names ')'           # initializer_expression_with_args
- | postfix_expression '.' Decimal_literal                     # explicit_member_expression1
+ | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
  | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
  | postfix_expression '.' identifier '(' argument_names ')'       # explicit_member_expression3
 // This does't exist in the swift grammar, but this valid swift statement fails without it
@@ -786,7 +792,7 @@ type
 
 // GRAMMAR OF A TYPE ANNOTATION
 
-type_annotation : ':' attributes? type  ;
+type_annotation : ':' attributes? 'inout'? type  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
