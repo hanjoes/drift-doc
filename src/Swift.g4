@@ -29,7 +29,11 @@
  * Converted from Apple's doc, http://tinyurl.com/n8rkoue, to ANTLR's
  * meta-language.
  */
-grammar Swift; // 2.2
+grammar Swift;
+
+@lexer::members {
+  public static final int COMMENTS = 1;
+}
 
 top_level : statement* EOF ;
 
@@ -1157,6 +1161,6 @@ Interpolated_text_item
 
 WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(HIDDEN) ; // nesting comments allowed
+Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(1) ; // nesting comments allowed
 
 Line_comment : '//' .*? ('\n'|EOF)				-> channel(HIDDEN) ;
