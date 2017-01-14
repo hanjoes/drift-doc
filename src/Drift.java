@@ -69,7 +69,7 @@ public class Drift {
 			ParserRuleContext root = parser.top_level();
 			// Walk the tree
 			ParseTreeWalker walker = new ParseTreeWalker();
-			walker.walk(new ConvertDocListener(), root);
+			walker.walk(new ConvertDocListener(tokenStream), root);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

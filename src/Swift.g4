@@ -32,7 +32,8 @@
 grammar Swift;
 
 @lexer::members {
-  public static final int COMMENTS = 1;
+public static final int BLOCK_COMMENT = 2;
+//public static final int LINE_COMMENT = 3;
 }
 
 top_level : statement* EOF ;
@@ -1161,6 +1162,6 @@ Interpolated_text_item
 
 WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(1) ; // nesting comments allowed
+Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(2) ; // nesting comments allowed
 
-Line_comment : '//' .*? ('\n'|EOF)				-> channel(HIDDEN) ;
+Line_comment : '//' .*? ('\n'|EOF)				-> channel(3) ;
