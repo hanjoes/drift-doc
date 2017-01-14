@@ -5,12 +5,21 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Drift {
+
+	public static final String TMP_DIR = "/tmp";
 
 	// Recursively search a directory for ".swift" files and
 	// convert any java-like doc to swift doc.
@@ -69,10 +78,34 @@ public class Drift {
 			ParserRuleContext root = parser.top_level();
 			// Walk the tree
 			ParseTreeWalker walker = new ParseTreeWalker();
-			walker.walk(new ConvertDocListener(tokenStream), root);
+			ConvertDocListener converter = new ConvertDocListener(tokenStream);
+			walker.walk(converter, root);
+
+			writeConvertedFile(pathname, converter.getResult());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	private void writeConvertedFile(String pathname, String result) {
+		File file = new File(pathname);
+		assert(file.exists());
+		Path originalPath = Paths.get(pathname);
+		String originalFilename = originalPath.getFileName().toString();
+		Path bakPath = Paths.get(TMP_DIR + "/" + originalFilename + "_bak_" + System.currentTimeMillis());
+		File bakFile = new File(bakPath.toString());
+		boolean res = file.renameTo(bakFile);
+		if (res) {
+			System.out.println("Backup file for: " + pathname + " created at " + bakPath.toString());
+			try (PrintWriter pw = new PrintWriter(pathname)) {
+				pw.write(result);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			System.out.println("Backup file creation failed. Aborted.");
+		}
 	}
 }
