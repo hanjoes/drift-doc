@@ -3,7 +3,12 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 
 public class ConvertDocListener extends SwiftBaseListener {
 
@@ -42,7 +47,8 @@ public class ConvertDocListener extends SwiftBaseListener {
 	}
 
 	// We need declaration also since "class_body" is composed of declarations
-	// and need to skip those declaration that are statements
+	// and need to skip those declaration that are children of statements,
+	// this will save some time
 	@Override
 	public void enterDeclaration(SwiftParser.DeclarationContext ctx) {
 		if (ctx.getParent() instanceof SwiftParser.StatementContext) {
@@ -90,27 +96,46 @@ public class ConvertDocListener extends SwiftBaseListener {
 
 	// rewrite token, assuming no nesting
 	private void rewriteComment(final Token token) {
-		String comment = token.getText();
-		// get rid of ws for whole comment
-		comment = comment.trim();
+		// get indent
+		List<Token> whitespaces = tokens.getHiddenTokensToLeft(token.getTokenIndex(), SwiftLexer.HIDDEN);
+		Optional<Token> wsBeforeComment = Optional.empty();
+		if (whitespaces != null) {
+			wsBeforeComment = whitespaces.stream().findFirst();
+		}
+		String indent = figureIndent(wsBeforeComment);
 
+		String comment = token.getText();
 		// remove comment block symbol
-		comment = trimBlock(comment);
-		comment = comment.trim();
+		comment = trimBlock(comment.trim()).trim();
 
 		// handle those lines begin with '*'
 		comment = trimLine(comment);
 
+		// since we get the meat of comment, we can convert it to javadoc
+		comment = Javadoc2SwiftMarkup.getSwiftMarkupFromJavadoc(comment);
+
 		// prepend each line with '// '
-		comment = prependLineCommentSymbol(comment);
+		comment = prependLineCommentSymbol(comment, indent);
 
 		// insert it back
 		rewriter.replace(token, comment);
 	}
 
+	private String figureIndent(Optional<Token> ws) {
+		String result = "";
+		if (ws.isPresent()) {
+			String tokenText = ws.get().getText();
+			int i = 0;
+			while (i < tokenText.length()
+					&& (tokenText.charAt(i) == '\r' || tokenText.charAt(i) == '\n')) ++i;
+			result = tokenText.substring(i);
+		}
+		return result;
+	}
+
 	private String trimBlock(final String comment) {
-		assert(comment.startsWith("/*"));
-		assert(comment.endsWith("*/"));
+		assert (comment.startsWith("/*"));
+		assert (comment.endsWith("*/"));
 		// beginning of the content.
 		int i = 2;
 		while (comment.charAt(i) == '*') ++i;
@@ -138,10 +163,15 @@ public class ConvertDocListener extends SwiftBaseListener {
 		return sb.toString();
 	}
 
-	private String prependLineCommentSymbol(final String comment) {
+	private String prependLineCommentSymbol(final String comment, String indent) {
 		String[] lines = comment.split("\n");
 		return Arrays.stream(lines)
-				.map(s -> "// " + s)
-				.reduce("", ((tmp, s) -> tmp + (tmp.length() > 0 ? "\n" : "") + s));
+				.map(s -> "/// " + s)
+				.reduce("", ((tmp, s) -> {
+					if (tmp.length() == 0) {
+						return s;
+					}
+					return tmp + "\n" + indent + s;
+				}));
 	}
 }

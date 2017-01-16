@@ -1,4 +1,3 @@
-import org.antlr.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -8,18 +7,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Drift {
 
 	public static final String TMP_DIR = "/tmp";
+	public static final boolean DEBUG = false;
 
 	// Recursively search a directory for ".swift" files and
 	// convert any java-like doc to swift doc.
@@ -81,7 +77,9 @@ public class Drift {
 			ConvertDocListener converter = new ConvertDocListener(tokenStream);
 			walker.walk(converter, root);
 
-			writeConvertedFile(pathname, converter.getResult());
+			if (!DEBUG) {
+				writeConvertedFile(pathname, converter.getResult());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
