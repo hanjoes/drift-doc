@@ -54,7 +54,6 @@ public class ConvertDocListener extends SwiftBaseListener {
 		if (ctx.getParent() instanceof SwiftParser.StatementContext) {
 			return;
 		}
-		System.out.println(ctx.getText());
 		grabCommentBeforeContext(ctx);
 	}
 
@@ -99,7 +98,10 @@ public class ConvertDocListener extends SwiftBaseListener {
 	private void rewriteComment(final Token token) {
 		// get indent
 		List<Token> whitespaces = tokens.getHiddenTokensToLeft(token.getTokenIndex(), SwiftLexer.HIDDEN);
-		Optional<Token> wsBeforeComment = whitespaces.stream().findFirst();
+		Optional<Token> wsBeforeComment = Optional.empty();
+		if (whitespaces != null) {
+			wsBeforeComment = whitespaces.stream().findFirst();
+		}
 		String indent = figureIndent(wsBeforeComment);
 
 		String comment = token.getText();
@@ -108,6 +110,9 @@ public class ConvertDocListener extends SwiftBaseListener {
 
 		// handle those lines begin with '*'
 		comment = trimLine(comment);
+
+		// since we get the meat of comment, we can convert it to javadoc
+		comment = Javadoc2SwiftMarkup.getSwiftMarkupFromJavadoc(comment);
 
 		// prepend each line with '// '
 		comment = prependLineCommentSymbol(comment, indent);

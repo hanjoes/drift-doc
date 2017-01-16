@@ -15,6 +15,7 @@ import java.util.List;
 public class Drift {
 
 	public static final String TMP_DIR = "/tmp";
+	public static final boolean DEBUG = false;
 
 	// Recursively search a directory for ".swift" files and
 	// convert any java-like doc to swift doc.
@@ -76,7 +77,9 @@ public class Drift {
 			ConvertDocListener converter = new ConvertDocListener(tokenStream);
 			walker.walk(converter, root);
 
-			writeConvertedFile(pathname, converter.getResult());
+			if (!DEBUG) {
+				writeConvertedFile(pathname, converter.getResult());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
