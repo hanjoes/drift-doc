@@ -15,7 +15,7 @@ import java.util.List;
 public class Drift {
 
 	public static final String TMP_DIR = "/tmp";
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	// Recursively search a directory for ".swift" files and
 	// convert any java-like doc to swift doc.

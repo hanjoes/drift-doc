@@ -188,16 +188,16 @@ Platform : Platform_name WS? Platform_version ;
 fragment
 Platform_name
  : 'iOS' | 'iOSApplicationExtension'
- | 'OSX' | 'OSXApplicationExtension'
+ | 'macOS' | 'macOSApplicationExtension'
  | 'watchOS'
  | 'tvOS' // ?
  ;
 
 fragment
 Platform_version
- : Pure_decimal_digits
- | Pure_decimal_digits '.' Pure_decimal_digits
- | Pure_decimal_digits '.' Pure_decimal_digits '.' Pure_decimal_digits
+ : Decimal_digit+
+ | Decimal_digit+ '.' Decimal_digit+
+ | Decimal_digit+ '.' Decimal_digit+ '.' Decimal_digit+
  ;
 
 // GRAMMAR OF A THROW STATEMENT
@@ -382,7 +382,7 @@ parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
 parameter
- : external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
+ : external_parameter_name? local_parameter_name type_annotation? '...'? default_argument_clause?
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
@@ -781,6 +781,7 @@ trailing_closure : closure_expression ;
 
 // GRAMMAR OF A TYPE
 
+// Not using child grammar because of Antlr can handle direct left-recursion.
 type
  : '[' type ']'
  | '[' type ':' type ']'
@@ -793,6 +794,8 @@ type
  | protocol_composition_type
  | type '.' 'Type'
  | type '.' 'Protocol'
+ | 'Any'
+ | 'Self'
  ;
 
 // GRAMMAR OF A TYPE ANNOTATION
@@ -810,17 +813,16 @@ type_name : identifier ;
 
 // GRAMMAR OF A TUPLE TYPE
 
-tuple_type : '(' tuple_type_body? ')'  ;
-tuple_type_body : tuple_type_element_list range_operator? ;
-tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
-tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
+tuple_type : '(' tuple_type_element_list? ')' ;
+tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list ;
+tuple_type_element : type | element_name type_annotation ;
 element_name : identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE
 
 //function_type
-// : type 'throws'? Arrow type
-// | type 'rethrows' Arrow type
+// : type 'throws'? arrow_operator type
+// | type 'rethrows' arrow_operator type
 // ;
 
 // GRAMMAR OF AN ARRAY TYPE
@@ -886,12 +888,13 @@ fragment Identifier_head : [a-zA-Z]
  | [\u3004-\u3007] | [\u3021-\u302F] | [\u3031-\u303F] | [\u3040-\uD7FF]
  | [\uF900-\uFD3D] | [\uFD40-\uFDCF] | [\uFDF0-\uFE1F] | [\uFE30-\uFE44]
  | [\uFE47-\uFFFD]
-/*
- | U+10000–U+1FFFD | U+20000–U+2FFFD | U+30000–U+3FFFD | U+40000–U+4FFFD
- | U+50000–U+5FFFD | U+60000–U+6FFFD | U+70000–U+7FFFD | U+80000–U+8FFFD
- | U+90000–U+9FFFD | U+A0000–U+AFFFD | U+B0000–U+BFFFD | U+C0000–U+CFFFD
- | U+D0000–U+DFFFD or U+E0000–U+EFFFD
-*/
+ /*
+ ANTLR can't handle char > 16bit.
+ | [\u10000–\u1FFFD] | [\u20000–\u2FFFD] | [\u30000–\u3FFFD] | [\u40000–\u4FFFD]
+ | [\u50000–\u5FFFD] | [\u60000–\u6FFFD] | [\u70000–\u7FFFD] | [\u80000–\u8FFFD]
+ | [\u90000–\u9FFFD] | [\uA0000–\uAFFFD] | [\uB0000–\uBFFFD] | [\uC0000–\uCFFFD]
+ | [\uD0000–\uDFFFD] | [\uE0000–\uEFFFD]
+ */
  ;
 
 fragment Identifier_character : [0-9]
@@ -962,33 +965,6 @@ From doc on operators:
 /* these following tokens are also a Binary_operator so much come first as special case */
 
 assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
-
-DOT    	: '.' ;
-LCURLY 	: '{' ;
-LPAREN 	: '(' ;
-LBRACK 	: '[' ;
-RCURLY 	: '}' ;
-RPAREN 	: ')' ;
-RBRACK 	: ']' ;
-COMMA  	: ',' ;
-COLON  	: ':' ;
-SEMI   	: ';' ;
-LT 		: '<' ;
-GT 		: '>' ;
-UNDERSCORE : '_' ;
-BANG 	: '!' ;
-QUESTION: '?' ;
-AT 		: '@' ;
-AND 	: '&' ;
-SUB 	: '-' ;
-EQUAL 	: '=' ;
-OR 		: '|' ;
-DIV 	: '/' ;
-ADD 	: '+' ;
-MUL 	: '*' ;
-MOD 	: '%' ;
-CARET 	: '^' ;
-TILDE 	: '~' ;
 
 /** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
  *  as specifically a negation prefix op.
@@ -1068,10 +1044,10 @@ Operator_following_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-dot_operator_head 		: '.' '.' ; // TODO: adjacent cols
+dot_operator_head 		: '.' ;
 dot_operator_character  : '.' | operator_character ;
 
-Implicit_parameter_name : '$' Pure_decimal_digits ;
+Implicit_parameter_name : '$' Decimal_digit+ ;
 
 // GRAMMAR OF A LITERAL
 
@@ -1092,7 +1068,6 @@ integer_literal
  : Binary_literal
  | Octal_literal
  | Decimal_literal
- | Pure_decimal_digits
  | Hexadecimal_literal
  ;
 
@@ -1106,8 +1081,7 @@ fragment Octal_digit : [0-7] ;
 fragment Octal_literal_character : Octal_digit | '_'  ;
 fragment Octal_literal_characters : Octal_literal_character+ ;
 
-Decimal_literal		: [0-9] [0-9_]* ;
-Pure_decimal_digits : [0-9]+ ;
+Decimal_literal		: Decimal_digit Decimal_literal_characters? ;
 fragment Decimal_digit : [0-9] ;
 fragment Decimal_literal_character : Decimal_digit | '_'  ;
 fragment Decimal_literal_characters : Decimal_literal_character+ ;
@@ -1149,10 +1123,17 @@ fragment
 Escaped_character
   : '\\' [0\\tnr"']
   | '\\x' Hexadecimal_digit Hexadecimal_digit
+  | '\\u' '{' Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit  '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit  '}'
   | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
   | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
   ;
 
+// TODO: This is a simulation of the original grammar.
 Interpolated_string_literal : '"' Interpolated_text_item* '"' ;
 fragment
 Interpolated_text_item
