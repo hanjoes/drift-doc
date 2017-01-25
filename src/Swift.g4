@@ -615,7 +615,6 @@ try_operator : 'try' '?' | 'try' '!' | 'try' ;
 
 // GRAMMAR OF A BINARY EXPRESSION
 
-
 binary_expression
   : binary_operator prefix_expression
 // as far as I can tell, assignment is not a valid operator as it has no return type
@@ -649,9 +648,11 @@ primary_expression
  | superclass_expression
  | closure_expression
  | parenthesized_expression
+ | tuple_expression
  | implicit_member_expression
  | wildcard_expression
  | selector_expression
+ | key_path_expression
  ;
 
 implicit_member_expression : '.' identifier ;
@@ -697,19 +698,31 @@ superclass_expression
   ;
 
 superclass_method_expression	  : 'super' '.' identifier  ;
-superclass_subscript_expression   : 'super' '[' expression ']'  ;
+superclass_subscript_expression   : 'super' '[' expression_list ']'  ;
 superclass_initializer_expression : 'super' '.' 'init'  ;
 
 // GRAMMAR OF A CLOSURE EXPRESSION
 
 closure_expression : '{' closure_signature? statements? '}'  ;
 closure_signature
- : parameter_clause function_result? 'in'
- | identifier_list function_result? 'in'
- | capture_list parameter_clause function_result? 'in'
- | capture_list identifier_list function_result? 'in'
+ : capture_list? closure_parameter_clause 'throws'? function_result? 'in'
  | capture_list 'in'
  ;
+
+closure_parameter_clause
+ : '(' ')'
+ | '(' closure_parameter_list ')'
+ | identifier_list
+ ;
+
+closure_parameter_list : closure_parameter (',' closure_parameter)* ;
+
+closure_parameter
+ : closure_parameter_name type_annotation?
+ | closure_parameter_name type_annotation '...'
+ ;
+
+closure_parameter_name : identifier;
 
 capture_list : '[' capture_list_items ']'  ;
 capture_list_items : capture_list_item (',' capture_list_item)* ;
@@ -719,9 +732,18 @@ capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
-parenthesized_expression : '(' expression_element_list? ')'  ;
-expression_element_list : expression_element (',' expression_element)* ;
-expression_element : expression | identifier ':' expression  ;
+parenthesized_expression : '(' expression ')'  ;
+
+// GRAMMAR OF A TUPLE EXPRESSION
+
+tuple_expression
+ : '(' ')'
+ | '(' tuple_element ',' tuple_element_list ')'
+ ;
+
+tuple_element_list : tuple_element (',' tuple_element)* ;
+
+tuple_element : expression | identifier ':' expression ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
 
@@ -729,7 +751,15 @@ wildcard_expression : '_'  ;
 
 // GRAMMAR OF A SELECTOR EXPRESSION
 
-selector_expression : '#selector' '(' expression ')' ;
+selector_expression
+ : '#selector' '(' expression ')'
+ | '#selector' '(' 'getter:' expression ')'
+ | '#selector' '(' 'setter:' expression ')'
+ ;
+
+// GRAMMAR OF A KEY-PATH EXPRESSION
+
+key_path_expression : '#keyPath' '(' expression ')' ;
 
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
