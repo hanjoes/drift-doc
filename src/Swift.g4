@@ -764,44 +764,32 @@ key_path_expression : '#keyPath' '(' expression ')' ;
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
 postfix_expression
- : primary_expression                                             # primary
- | postfix_expression postfix_operator                            # postfix_operation
- | postfix_expression parenthesized_expression                    # function_call_expression
- | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
- | postfix_expression '.' 'init'                                  # initializer_expression
- | postfix_expression '.' 'init' '(' argument_names ')'           # initializer_expression_with_args
- | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
- | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
- | postfix_expression '.' identifier '(' argument_names ')'       # explicit_member_expression3
-// This does't exist in the swift grammar, but this valid swift statement fails without it
-// self.addTarget(self, action: #selector(nameOfAction(_:)))
- | postfix_expression '(' argument_names ')'                      # explicit_member_expression4
- | postfix_expression '.' 'self'                                  # postfix_self_expression
- | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
- | postfix_expression '[' expression_list ']'                     # subscript_expression
+ : primary_expression                                                   # primary
+ | postfix_expression postfix_operator                                  # postfix_operation
+ | postfix_expression function_call_argument_clause                     # function_call_expression
+ | postfix_expression function_call_argument_clause? trailing_closure   # function_call_with_closure_expression
+ | postfix_expression '.' 'init'                                        # initializer_expression
+ | postfix_expression '.' 'init' '(' argument_names ')'                 # initializer_expression_with_args
+ | postfix_expression '.' Decimal_literal                               # explicit_member_expression1
+ | postfix_expression '.' identifier generic_argument_clause?           # explicit_member_expression2
+ | postfix_expression '.' identifier '(' argument_names ')'             # explicit_member_expression3
+ | postfix_expression '.' 'self'                                        # postfix_self_expression
+ | 'type' '(' 'of' ':' expression ')'                                   # dynamic_type_expression
+ | postfix_expression '[' expression_list ']'                           # subscript_expression
 // ! is a postfix operator already
-// | postfix_expression '!'                                         # forced_value_expression
+// | postfix_expression '!'                                             # forced_value_expression
 // ? is a postfix operator already
-// | postfix_expression '?'                                         # optional_chaining_expression
+// | postfix_expression '?'                                             # optional_chaining_expression
  ;
 
-/* This might be faster than above
-postfix_expression
-  :  primary_expression
-	 ( postfix_operator
-	 | parenthesized_expression
-	 | parenthesized_expression? trailing_closure
-	 | '.' 'init'
-	 | '.' Pure_decimal_digits
-	 | '.' identifier generic_argument_clause?
-	 | '.' 'self'
-	 | '.' 'dynamicType'
-	 | '[' expression_list ']'
-	 | '!'
-	 | '?'
-	 )*
+function_call_argument_clause : '(' ')' | '(' function_call_argument_list ')' ;
+function_call_argument_list : function_call_argument (',' function_call_argument)* ;
+function_call_argument
+ : expression
+ | identifier ':' expression
+ | operator
+ | identifier ':' operator
  ;
-*/
 
 argument_names : argument_name argument_names? ;
 
