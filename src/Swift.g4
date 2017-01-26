@@ -38,8 +38,6 @@ public static final int BLOCK_COMMENT = 2;
 
 top_level : statement* EOF ;
 
-// Statements
-
 // GRAMMAR OF A STATEMENT
 
 statement
@@ -57,30 +55,13 @@ statement
 
 statements : statement+ ;
 
-/** A naked '=' op is not part of a valid expression so I'm making it a statement;
- *  see comment on binary_expression.  It also resolves ambiguity between
- *  rule pattern's expression_pattern alt and pattern_initializer.
-assignment_statement
- : try_operator? prefix_expression assignment_operator try_operator? prefix_expression
- ;
- */
-
 // GRAMMAR OF A LOOP STATEMENT
 
-loop_statement : for_statement
- | for_in_statement
+loop_statement
+ : for_in_statement
  | while_statement
  | repeat_while_statement
  ;
-
-// GRAMMAR OF A FOR STATEMENT
-
-for_statement
- : 'for' for_init? ';' expression? ';' expression? code_block
- | 'for' '(' for_init? ';' expression? ';' expression? ')' code_block
- ;
-
-for_init : variable_declaration | expression_list  ;
 
 // GRAMMAR OF A FOR_IN STATEMENT
 
@@ -88,14 +69,7 @@ for_in_statement : 'for' 'case'? pattern 'in' expression where_clause? code_bloc
 
 // GRAMMAR OF A WHILE STATEMENT
 
-while_statement : 'while' condition_clause code_block  ;
-
-condition_clause
- : expression
- | expression ',' condition_list
- | condition_list
- | availability_condition ',' expression
- ;
+while_statement : 'while' condition_list code_block  ;
 
 condition_list : condition (',' condition)* ;
 condition
@@ -104,12 +78,12 @@ condition
  | optional_binding_condition
  | expression
  ;
-case_condition : 'case' pattern initializer where_clause? ;
+
+case_condition : 'case' pattern initializer ;
 optional_binding_condition
  : 'let' pattern initializer
  | 'var' pattern initializer
  ;
-
 
 // GRAMMAR OF A REPEAT-WHILE STATEMENT
 
@@ -117,40 +91,55 @@ repeat_while_statement : 'repeat' code_block 'while' expression ;
 
 // GRAMMAR OF A BRANCH STATEMENT
 
-branch_statement : if_statement
+branch_statement
+ : if_statement
  | guard_statement
  | switch_statement
  ;
 
 // GRAMMAR OF AN IF STATEMENT
 
-if_statement : 'if' condition_clause code_block else_clause? ;
-else_clause : 'else' code_block | 'else' if_statement  ;
+if_statement : 'if' condition_list code_block else_clause? ;
+else_clause
+ : 'else' code_block
+ | 'else' if_statement
+ ;
 
 // GRAMMAR OF A GUARD STATEMENT
 
-guard_statement : 'guard' condition_clause 'else' code_block ;
+guard_statement : 'guard' condition_list 'else' code_block ;
 
 // GRAMMAR OF A SWITCH STATEMENT
 
 switch_statement : 'switch' expression '{' switch_cases? '}'  ;
 switch_cases : switch_case switch_cases? ;
-switch_case : case_label statements | default_label statements  ;
+switch_case
+ : case_label statements
+ | default_label statements
+ ;
 case_label : 'case' case_item_list ':' ;
-case_item_list : pattern where_clause? | pattern where_clause? ',' case_item_list  ;
+case_item_list
+ : pattern where_clause?
+ | pattern where_clause? ',' case_item_list
+ ;
 default_label : 'default' ':' ;
 where_clause : 'where' where_expression ;
 where_expression : expression ;
 
 // GRAMMAR OF A LABELED STATEMENT
 
-labeled_statement : statement_label loop_statement | statement_label if_statement | statement_label switch_statement ;
+labeled_statement
+ : statement_label loop_statement
+ | statement_label if_statement
+ | statement_label switch_statement
+ ;
 statement_label : label_name ':' ;
 label_name : identifier  ;
 
 // GRAMMAR OF A CONTROL TRANSFER STATEMENT
 
-control_transfer_statement : break_statement
+control_transfer_statement
+ : break_statement
  | continue_statement
  | fallthrough_statement
  | return_statement
@@ -173,36 +162,6 @@ fallthrough_statement : 'fallthrough'  ;
 
 return_statement : 'return' expression? ;
 
-
-// GRAMMAR OF AN AVAILABILITY CONDITION
-
-availability_condition : '#available' '(' availability_arguments ')' ;
-
-availability_arguments : availability_argument (',' availability_argument)* ;
-
-availability_argument : Platform | '*' ;
-
-/** Must match as token so Platform_version doesn't look like a float literal */
-Platform : Platform_name WS? Platform_version ;
-
-fragment
-Platform_name
- : 'iOS' | 'iOSApplicationExtension'
- | 'macOS' | 'macOSApplicationExtension'
- | 'watchOS'
- | 'tvOS' // ?
- ;
-
-fragment
-Platform_version
- : Decimal_digit+
- | Decimal_digit+ '.' Decimal_digit+
- | Decimal_digit+ '.' Decimal_digit+ '.' Decimal_digit+
- ;
-
-// GRAMMAR OF A THROW STATEMENT
-throw_statement : 'throw' expression ;
-
 // GRAMMAR OF A DEFER STATEMENT
 
 defer_statement : 'defer' code_block ;
@@ -213,43 +172,83 @@ do_statement : 'do' code_block catch_clauses? ;
 catch_clauses : catch_clause catch_clauses? ;
 catch_clause : 'catch' pattern? where_clause? code_block ;
 
+// GRAMMAR OF A THROW STATEMENT
+throw_statement : 'throw' expression ;
+
 // GRAMMAR OF A COMPILER CONTROL STATEMENT
 
-compiler_control_statement : build_configuration_statement
+compiler_control_statement
+ : conditional_compilation_block
  | line_control_statement
  ;
 
 // GRAMMAR OF A BUILD CONFIGURATION STATEMENT
 
-build_configuration_statement: '#if' build_configuration statements? build_configuration_elseif_clauses? build_configuration_else_clause? '#endif' ;
-build_configuration_elseif_clauses : build_configuration_elseif_clause build_configuration_elseif_clauses? ;
-build_configuration_elseif_clause : '#elseif' build_configuration statements? ;
-build_configuration_else_clause : '#else' statements? ;
+conditional_compilation_block : if_directive_clause elseif_directive_clauses? else_directive_clause ;
+if_directive_clause : if_directive compilation_condition statements? ;
+elseif_directive_clauses : elseif_directive_clause+ ;
+elseif_directive_clause : elseif_directive compilation_condition statements? ;
+else_directive_clause : else_directive statements? ;
 
-build_configuration : platform_testing_function
+if_directive : '#if' ;
+elseif_directive : '#elseif' ;
+else_directive : '#else' ;
+endif_directive : '#endif' ;
+
+compilation_condition
+ : platform_condition
  | identifier
  | boolean_literal
- | '(' build_configuration ')'
- | '!' build_configuration
- | build_configuration build_AND build_configuration
- | build_configuration build_OR build_configuration
+ | '(' compilation_condition ')'
+ | '!' compilation_condition
+ | compilation_condition '&&' compilation_condition
+ | compilation_condition '||' compilation_condition
  ;
 
-platform_testing_function : 'os' '(' operating_system ')'
+platform_condition
+ : 'os' '(' operating_system ')'
  | 'arch' '(' architecture ')'
+ | 'swift' '(' '>=' swift_version ')'
  ;
 
-operating_system : 'OSX' | 'iOS' | 'watchOS' | 'tvOS' ;
+operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' ;
 architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
+swift_version : Decimal_literal  '.' Decimal_literal ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
 
-line_control_statement : '#line'
- | '#line' line_number file_name
+line_control_statement
+ : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
+ | '#sourceLocation' '(' ')'
  ;
 
-line_number : integer_literal ;
+line_number : Decimal_literal ;
 file_name : Static_string_literal ;
+
+// GRAMMAR OF AN AVAILABILITY CONDITION
+
+availability_condition : '#available' '(' availability_arguments ')' ;
+
+availability_arguments : availability_argument (',' availability_argument)* ;
+
+availability_argument : Platform | '*' ;
+
+Platform : Platform_name WS? Platform_version ;
+
+fragment
+Platform_name
+ : 'iOS' | 'iOSApplicationExtension'
+ | 'macOS' | 'macOSApplicationExtension'
+ | 'watchOS'
+ | 'tvOS'
+ ;
+
+fragment
+Platform_version
+ : Decimal_digit+
+ | Decimal_digit+ '.' Decimal_digit+
+ | Decimal_digit+ '.' Decimal_digit+ '.' Decimal_digit+
+ ;
 
 // Generic Parameters and Arguments
 
@@ -298,6 +297,7 @@ declaration
  | extension_declaration
  | subscript_declaration
  | operator_declaration
+ | precedence_group_declaration
  ;
 
 declarations : declaration+ ;
@@ -305,7 +305,7 @@ declarations : declaration+ ;
 
 // GRAMMAR OF A TOP-LEVEL DECLARATION
 
-top_level_declaration : statements? ;
+// top_level_declaration : statements? ; entrance moved to top.
 
 // GRAMMAR OF A CODE BLOCK
 
@@ -323,12 +323,13 @@ import_path_identifier : identifier | operator  ;
 constant_declaration : attributes? declaration_modifiers? 'let' pattern_initializer_list  ;
 pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
 
-/** rule is ambiguous. can match "var x = 1" with x as pattern
+/** rule is ambiguous. can match "var x = 1" with x as identifier_pattern
  *  OR with x as expression_pattern.
- *  ANTLR resolves in favor or first choice: pattern is x, 1 is initializer.
+ *  ANTLR resolves in favor or first choice: x is identifier_pattern,
+ *  1 is initializer.
  */
 pattern_initializer : pattern initializer? ;
-initializer : assignment_operator expression  ;
+initializer : assignment_operator expression ;
 
 // GRAMMAR OF A VARIABLE DECLARATION
 
@@ -344,120 +345,132 @@ variable_declaration
 variable_declaration_head : attributes? declaration_modifiers? 'var'  ;
 variable_name : identifier  ;
 
-getter_setter_block : '{' getter_clause setter_clause?'}'  | '{' setter_clause getter_clause '}'  ;
-getter_clause : attributes? 'get' code_block  ;
-setter_clause : attributes? 'set' setter_name? code_block  ;
+getter_setter_block
+ : code_block
+ | '{' getter_clause setter_clause?'}'
+ | '{' setter_clause getter_clause '}'
+ ;
+getter_clause : attributes? mutation_modifier? 'get' code_block  ;
+setter_clause : attributes? mutation_modifier? 'set' setter_name? code_block  ;
 setter_name : '(' identifier ')'  ;
 
 getter_setter_keyword_block : '{' getter_keyword_clause setter_keyword_clause?'}' | '{' setter_keyword_clause getter_keyword_clause '}'  ;
-getter_keyword_clause : attributes? 'get'  ;
-setter_keyword_clause : attributes? 'set'  ;
+getter_keyword_clause : attributes? mutation_modifier? 'get'  ;
+setter_keyword_clause : attributes? mutation_modifier? 'set'  ;
 
-willSet_didSet_block : '{' willSet_clause didSet_clause?'}' | '{' didSet_clause willSet_clause '}'  ;
+willSet_didSet_block
+ : '{' willSet_clause didSet_clause?'}'
+ | '{' didSet_clause willSet_clause '}'
+ ;
 willSet_clause : attributes? 'willSet' setter_name? code_block  ;
 didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 
 // GRAMMAR OF A TYPE ALIAS DECLARATION
 
-typealias_declaration : typealias_head typealias_assignment  ;
-typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
+typealias_declaration : attributes? access_level_modifier? 'typealias' typealias_name generic_parameter_clause? typealias_assignment ;
 typealias_name : identifier  ;
 typealias_assignment : assignment_operator type  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
-// NOTE: Swift Grammar Spec indicates that a function_body is optional
 function_declaration
- : function_head function_name generic_parameter_clause? function_signature
-   function_body?
- ;
+ : function_head function_name generic_parameter_clause? function_signature generic_where_clause? function_body? ;
+
 function_head : attributes? declaration_modifiers? 'func'  ;
 function_name : identifier |  operator  ;
 function_signature
- : parameter_clauses 'throws'? function_result?
- | parameter_clauses 'rethrows' function_result?
+ : parameter_clause 'throws'? function_result?
+ | parameter_clause 'rethrows' function_result?
  ;
 function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
-parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
-parameter
- : external_parameter_name? local_parameter_name type_annotation? '...'? default_argument_clause?
- ;
-external_parameter_name : identifier | '_'  ;
-local_parameter_name : identifier | '_'  ;
+parameter : external_parameter_name? local_parameter_name type_annotation? '...'? default_argument_clause? ;
+external_parameter_name : identifier ;
+local_parameter_name : identifier ;
 default_argument_clause : assignment_operator expression  ;
-
 
 // GRAMMAR OF AN ENUMERATION DECLARATION
 
-enum_declaration : attributes? access_level_modifier? union_style_enum | attributes? access_level_modifier? raw_value_style_enum  ;
-union_style_enum : 'indirect'? 'enum' enum_name generic_parameter_clause? type_inheritance_clause? '{' union_style_enum_members?'}' ;
+enum_declaration
+ : attributes? access_level_modifier? union_style_enum
+ | attributes? access_level_modifier? raw_value_style_enum
+ ;
+union_style_enum : 'indirect'? 'enum' enum_name generic_parameter_clause? type_inheritance_clause? generic_where_clause? '{' union_style_enum_members?'}' ;
 union_style_enum_members : union_style_enum_member union_style_enum_members? ;
-union_style_enum_member : declaration | union_style_enum_case_clause  ;
+union_style_enum_member : declaration | union_style_enum_case_clause | compiler_control_statement ;
 union_style_enum_case_clause : attributes? 'indirect'? 'case' union_style_enum_case_list  ;
 union_style_enum_case_list : union_style_enum_case | union_style_enum_case ',' union_style_enum_case_list  ;
 union_style_enum_case : enum_case_name tuple_type? ;
 enum_name : identifier  ;
 enum_case_name : identifier  ;
-raw_value_style_enum : 'enum' enum_name generic_parameter_clause? type_inheritance_clause '{' raw_value_style_enum_members '}' ;
+raw_value_style_enum : 'enum' enum_name generic_parameter_clause? type_inheritance_clause generic_where_clause? '{' raw_value_style_enum_members '}' ;
 raw_value_style_enum_members : raw_value_style_enum_member raw_value_style_enum_members? ;
-raw_value_style_enum_member : declaration | raw_value_style_enum_case_clause  ;
-raw_value_style_enum_case_clause : attributes? 'case' raw_value_style_enum_case_list  ;
+raw_value_style_enum_member : declaration | raw_value_style_enum_case_clause | compiler_control_statement ;
+raw_value_style_enum_case_clause : attributes? 'case' raw_value_style_enum_case_list ;
 raw_value_style_enum_case_list : raw_value_style_enum_case | raw_value_style_enum_case ',' raw_value_style_enum_case_list  ;
 raw_value_style_enum_case : enum_case_name raw_value_assignment? ;
 raw_value_assignment : assignment_operator raw_value_literal  ;
 raw_value_literal : numeric_literal | Static_string_literal | boolean_literal ;
 
-// GRAMMAR OF A STRUCTURE DECLARATION TODO did not update
+// GRAMMAR OF A STRUCTURE DECLARATION
 
-struct_declaration : attributes? access_level_modifier? 'struct' struct_name generic_parameter_clause? type_inheritance_clause? struct_body  ;
-struct_name : identifier  ;
-struct_body : '{' declarations?'}'  ;
+struct_declaration : attributes? access_level_modifier? 'struct' struct_name generic_parameter_clause? type_inheritance_clause? generic_where_clause? struct_body  ;
+struct_name : identifier ;
+struct_body : '{' struct_members? '}' ;
+
+struct_members : struct_member struct_members? ;
+struct_member : declaration | compiler_control_statement ;
 
 // GRAMMAR OF A CLASS DECLARATION
 
 class_declaration
  : attributes? access_level_modifier? 'final'? 'class' class_name
-   generic_parameter_clause? type_inheritance_clause? class_body
+   generic_parameter_clause? type_inheritance_clause? generic_where_clause? class_body
  | attributes? 'final' access_level_modifier? 'class' class_name
-   generic_parameter_clause? type_inheritance_clause? class_body
+   generic_parameter_clause? type_inheritance_clause? generic_where_clause? class_body
  ;
 class_name : identifier ;
-class_body : '{' declarations? '}'  ;
+class_body : '{' class_members? '}' ;
+
+class_members : class_member class_members? ;
+class_member: declaration | compiler_control_statement ;
 
 // GRAMMAR OF A PROTOCOL DECLARATION
 
-protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body  ;
-protocol_name : identifier  ;
-protocol_body : '{' protocol_member_declarations? '}'  ;
+protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body ;
+protocol_name : identifier ;
+protocol_body : '{' protocol_members? '}' ;
 
-protocol_member_declaration : protocol_property_declaration
+protocol_members : protocol_member protocol_members? ;
+
+protocol_member
+ : protocol_property_declaration
  | protocol_method_declaration
  | protocol_initializer_declaration
  | protocol_subscript_declaration
  | protocol_associated_type_declaration
+ | type_alias_declaration
  ;
-protocol_member_declarations : protocol_member_declaration protocol_member_declarations? ;
 
 // GRAMMAR OF A PROTOCOL PROPERTY DECLARATION
 
-protocol_property_declaration : variable_declaration_head variable_name type_annotation getter_setter_keyword_block  ;
+protocol_property_declaration : variable_declaration_head variable_name type_annotation getter_setter_keyword_block ;
 
 // GRAMMAR OF A PROTOCOL METHOD DECLARATION
 
-protocol_method_declaration : function_head function_name generic_parameter_clause? function_signature  ;
+protocol_method_declaration : function_head function_name generic_parameter_clause? function_signature generic_where_clause? ;
 
 // GRAMMAR OF A PROTOCOL INITIALIZER DECLARATION
 
 protocol_initializer_declaration
- : initializer_head generic_parameter_clause? parameter_clause 'throws'?
- | initializer_head generic_parameter_clause? parameter_clause 'rethrows'
+ : initializer_head generic_parameter_clause? parameter_clause 'throws'? generic_where_clause?
+ | initializer_head generic_parameter_clause? parameter_clause 'rethrows' generic_where_clause?
  ;
 
 // GRAMMAR OF A PROTOCOL SUBSCRIPT DECLARATION
 
-protocol_subscript_declaration : subscript_head subscript_result getter_setter_keyword_block  ;
+protocol_subscript_declaration : subscript_head subscript_result getter_setter_keyword_block ;
 
 // GRAMMAR OF A PROTOCOL ASSOCIATED TYPE DECLARATION
 
@@ -476,7 +489,7 @@ initializer_head
  | attributes? declaration_modifiers? 'init' '!'
  ;
 
-initializer_body : code_block  ;
+initializer_body : code_block ;
 
 // GRAMMAR OF A DEINITIALIZER DECLARATION
 
