@@ -254,24 +254,27 @@ Platform_version
 
 // GRAMMAR OF A GENERIC PARAMETER CLAUSE
 
-generic_parameter_clause : '<' generic_parameter_list requirement_clause? '>'  ;
-generic_parameter_list : generic_parameter (',' generic_parameter)*  ;
+generic_parameter_clause : '<' generic_parameter_list '>' ;
+generic_parameter_list : generic_parameter (',' generic_parameter)* ;
 generic_parameter
  : type_name
  | type_name ':' type_identifier
  | type_name ':' protocol_composition_type
  ;
 
-requirement_clause : 'where' requirement_list  ;
-requirement_list : requirement | requirement ',' requirement_list  ;
-requirement : conformance_requirement | same_type_requirement  ;
+generic_where_clause : 'where' requirement_list ;
+requirement_list : requirement | requirement ',' requirement_list ;
+requirement : conformance_requirement | same_type_requirement ;
 
-conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier same_type_equals type  ;
+conformance_requirement
+ : type_identifier ':' type_identifier
+ | type_identifier ':' protocol_composition_type
+ ;
+same_type_requirement : type_identifier same_type_equals type ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
-generic_argument_clause : '<' generic_argument_list '>'  ;
+generic_argument_clause : '<' generic_argument_list '>' ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type ;
 
@@ -450,7 +453,7 @@ protocol_member
  | protocol_initializer_declaration
  | protocol_subscript_declaration
  | protocol_associated_type_declaration
- | type_alias_declaration
+ | typealias_declaration
  ;
 
 // GRAMMAR OF A PROTOCOL PROPERTY DECLARATION
@@ -497,8 +500,14 @@ deinitializer_declaration : attributes? 'deinit' code_block  ;
 
 // GRAMMAR OF AN EXTENSION DECLARATION
 
-extension_declaration : access_level_modifier? 'extension' type_identifier type_inheritance_clause? extension_body  ;
-extension_body : '{' declarations?'}'  ;
+extension_declaration
+ : attribute? access_level_modifier? 'extension' type_identifier type_inheritance_clause? extension_body
+ | attribute? access_level_modifier? 'extension' type_identifier generic_where_clause extension_body
+ ;
+extension_body : '{' extension_members? '}' ;
+
+extension_members : extension_member+ ;
+extension_member : declaration | compiler_control_statement ;
 
 // GRAMMAR OF A SUBSCRIPT DECLARATION
 
@@ -508,32 +517,66 @@ subscript_declaration
  | subscript_head subscript_result getter_setter_keyword_block
  ;
 
-subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : arrow_operator attributes? type  ;
+subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause ;
+subscript_result : arrow_operator attributes? type ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
-prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
-postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
-infix_operator_attributes : precedence_clause? associativity_clause? ;
-precedence_clause : 'precedence' precedence_level ;
-precedence_level : integer_literal ;
-associativity_clause : 'associativity' associativity ;
-associativity : 'left' | 'right' | 'none' ;
+
+prefix_operator_declaration : 'prefix' 'operator' operator ;
+postfix_operator_declaration : 'postfix' 'operator' operator ;
+infix_operator_declaration : 'infix' 'operator' operator infix_operator_group? ;
+
+infix_operator_group : precedence_group_name ;
+
+// GRAMMAR OF A PRECEDENCE GROUP DECLARATION
+
+precedence_group_declaration : 'precedencegroup' precedence_group_name '{' precedence_group_attributes? '}' ;
+
+precedence_group_attributes : precedence_group_attribute precedence_group_attributes? ;
+precedence_group_attribute
+ : precedence_group_relation
+ | precedence_group_assignment
+ | precedence_group_associativity
+ ;
+
+precedence_group_relation
+ : 'higherThan' ':' precedence_group_names
+ | 'lowerThan' ':' precedence_group_names
+ ;
+
+precedence_group_assignment : 'assignment' ':' boolean_literal ;
+
+precedence_group_associativity
+ : 'associativity' ':' 'left'
+ | 'associativity' ':' 'right'
+ | 'associativity' ':' 'none'
+ ;
+
+precedence_group_names : precedence_group_name | precedence_group_name ',' precedence_group_names ;
+precedence_group_name : identifier ;
 
 // GRAMMAR OF A DECLARATION MODIFIER
+
 declaration_modifier
- : 'class' | 'convenience' | 'dynamic' | 'final' | 'infix' | 'lazy' | 'mutating' | 'nonmutating' | 'optional' | 'override' | 'postfix' | 'prefix' | 'required' | 'static' | 'unowned' | 'unowned' '(' 'safe' ')' | 'unowned' '(' 'unsafe' ')' | 'weak'
+ : 'class' | 'convenience' | 'dynamic' | 'final' | 'infix' | 'lazy' | 'optional' | 'override' | 'postfix' | 'prefix' | 'required' | 'static' | 'unowned' | 'unowned' '(' 'safe' ')' | 'unowned' '(' 'unsafe' ')' | 'weak'
  | access_level_modifier
+ | mutation_modifier
  ;
 declaration_modifiers : declaration_modifier declaration_modifiers? ;
 
 access_level_modifier
  : 'internal' | 'internal' '(' 'set' ')'
  | 'private' | 'private' '(' 'set' ')'
+ | 'fileprivate' | 'fileprivate' '(' 'set' ')'
  | 'public' | 'public' '(' 'set' ')'
+ | 'open' | 'open' '(' 'set' ')'
+ ;
+
+mutation_modifier
+ : 'mutating'
+ | 'nonmutating'
  ;
 
 // Patterns
@@ -567,16 +610,15 @@ value_binding_pattern : 'var' pattern | 'let' pattern  ;
 // GRAMMAR OF A TUPLE PATTERN
 
 tuple_pattern : '(' tuple_pattern_element_list? ')'  ;
-tuple_pattern_element_list
-	:	tuple_pattern_element (',' tuple_pattern_element)*
-	;
-tuple_pattern_element : pattern  ;
+tuple_pattern_element_list :	tuple_pattern_element (',' tuple_pattern_element)* ;
+tuple_pattern_element : pattern | identifier ':' pattern ;
 
 // GRAMMAR OF AN ENUMERATION CASE PATTERN
 
-enum_case_pattern : type_identifier? '.' enum_case_name tuple_pattern? ;
+enum_case_pattern : type_identifier '.' enum_case_name tuple_pattern? ;
 
 // GRAMMAR OF AN OPTIONAL PATTERN
+
 optional_pattern : identifier_pattern '?' ;
 
 // GRAMMAR OF A TYPE CASTING PATTERN
@@ -592,17 +634,18 @@ expression_pattern : expression  ;
 
 // GRAMMAR OF AN ATTRIBUTE
 
-attribute : '@'? attribute_name attribute_argument_clause? ;
+attribute : '@' attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
 attributes : attribute+ ;
+
 balanced_tokens : balanced_token+ ;
 balanced_token
  : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | operator
-// | Any punctuation except ( ,  ')' , '[' , ']' , { , or } TODO add?
+ | identifier | context_sensitive_keyword | literal | operator
+ // TODO: | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
 
 // Expressions
