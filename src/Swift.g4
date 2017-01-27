@@ -179,7 +179,7 @@ throw_statement : 'throw' expression ;
 
 compiler_control_statement
  : conditional_compilation_block
- | line_control_statement
+// | line_control_statement
  ;
 
 // GRAMMAR OF A BUILD CONFIGURATION STATEMENT
@@ -216,14 +216,14 @@ architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
 swift_version : Decimal_literal  '.' Decimal_literal ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
-
-line_control_statement
- : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
- | '#sourceLocation' '(' ')'
- ;
-
-line_number : Decimal_literal ;
-file_name : Static_string_literal ;
+//
+//line_control_statement
+// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
+// | '#sourceLocation' '(' ')'
+// ;
+//
+//line_number : Decimal_literal ;
+//file_name : Static_string_literal ;
 
 // GRAMMAR OF AN AVAILABILITY CONDITION
 
@@ -1039,6 +1039,33 @@ From doc on operators:
 /* these following tokens are also a Binary_operator so much come first as special case */
 
 assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
+
+DOT    	: '.' ;
+LCURLY 	: '{' ;
+LPAREN 	: '(' ;
+LBRACK 	: '[' ;
+RCURLY 	: '}' ;
+RPAREN 	: ')' ;
+RBRACK 	: ']' ;
+COMMA  	: ',' ;
+COLON  	: ':' ;
+SEMI   	: ';' ;
+LT 		: '<' ;
+GT 		: '>' ;
+UNDERSCORE : '_' ;
+BANG 	: '!' ;
+QUESTION: '?' ;
+AT 		: '@' ;
+AND 	: '&' ;
+SUB 	: '-' ;
+EQUAL 	: '=' ;
+OR 		: '|' ;
+DIV 	: '/' ;
+ADD 	: '+' ;
+MUL 	: '*' ;
+MOD 	: '%' ;
+CARET 	: '^' ;
+TILDE 	: '~' ;
 
 /** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
  *  as specifically a negation prefix op.

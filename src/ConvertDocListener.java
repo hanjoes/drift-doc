@@ -37,12 +37,12 @@ public class ConvertDocListener extends SwiftBaseListener {
 	}
 
 	@Override
-	public void enterProtocol_member_declaration(SwiftParser.Protocol_member_declarationContext ctx) {
+	public void enterProtocol_members(SwiftParser.Protocol_membersContext ctx) {
 		grabCommentBeforeContext(ctx);
 	}
 
 	@Override
-	public void exitProtocol_member_declaration(SwiftParser.Protocol_member_declarationContext ctx) {
+	public void exitProtocol_members(SwiftParser.Protocol_membersContext ctx) {
 		grabCommentAfterContext(ctx);
 	}
 
