@@ -208,7 +208,7 @@ compilation_condition
 platform_condition
  : 'os' '(' operating_system ')'
  | 'arch' '(' architecture ')'
- | 'swift' '(' '>=' swift_version ')'
+// | 'swift' '(' '>=' swift_version ')' TODO: Disambiguate with operator
  ;
 
 operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' ;
@@ -218,7 +218,7 @@ swift_version : Decimal_literal  '.' Decimal_literal ;
 // GRAMMAR OF A LINE CONTROL STATEMENT
 //
 //line_control_statement
-// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
+// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')' TODO: line could be arg name
 // | '#sourceLocation' '(' ')'
 // ;
 //
@@ -1072,10 +1072,7 @@ TILDE 	: '~' ;
  */
 negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
 
-build_AND 		: {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
-build_OR  		: {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
 arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
-range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
 same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
 
 /**
@@ -1106,7 +1103,7 @@ postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
 
 operator
   : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
-  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
+  | dot_operator_head {_input.get(_input.index()-1).getType()!=WS}? dot_operator_character
   ;
 
 operator_character

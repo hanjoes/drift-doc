@@ -53,26 +53,7 @@ public class SwiftSupport {
 		operatorHead.set(SwiftParser.CARET);
 		operatorHead.set(SwiftParser.TILDE);
 		operatorHead.set(SwiftParser.QUESTION);
-		operatorHead.set(0xA1,0xA7+1);
-		operatorHead.set(0xA9,0xAB+1);
-		operatorHead.set(0xAC,0xAE+1);
-		operatorHead.set(0xB0,0xB1+1);
-		operatorHead.set(0xB6);
-		operatorHead.set(0xBB);
-		operatorHead.set(0xBF);
-		operatorHead.set(0xD7);
-		operatorHead.set(0xF7);
-		operatorHead.set(0x2016,0x2017+1);
-		operatorHead.set(0x2020,0x2027+1);
-		operatorHead.set(0x2030,0x203E+1);
-		operatorHead.set(0x2041,0x2053+1);
-		operatorHead.set(0x2055,0x205E+1);
-		operatorHead.set(0x2190,0x23FF+1);
-		operatorHead.set(0x2500,0x2775+1);
-		operatorHead.set(0x2794,0x2BFF+1);
-		operatorHead.set(0x2E00,0x2E7F+1);
-		operatorHead.set(0x3001,0x3003+1);
-		operatorHead.set(0x3008,0x3030+1);
+		operatorHead.set(SwiftParser.Operator_head_other);
 
 		leftWS.set(SwiftParser.WS);
 		leftWS.set(SwiftParser.LPAREN);
@@ -175,7 +156,7 @@ public class SwiftSupport {
 		boolean nextIsWS = isRightOperatorWS(nextToken);
 		boolean result = prevIsWS && nextIsWS || (!prevIsWS && !nextIsWS);
 		String text = tokens.getText(Interval.of(start, stop));
-		//System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+//		System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
@@ -195,7 +176,7 @@ public class SwiftSupport {
 		boolean nextIsWS = isRightOperatorWS(nextToken);
 		boolean result = prevIsWS && !nextIsWS;
 		String text = tokens.getText(Interval.of(start, stop));
-		//System.out.println("isPrefixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+//		System.out.println("isPrefixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
@@ -222,7 +203,7 @@ public class SwiftSupport {
 			!prevIsWS && nextIsWS ||
 			!prevIsWS && nextToken.getType()==SwiftParser.DOT;
 		String text = tokens.getText(Interval.of(start, stop));
-		//System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+//		System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
