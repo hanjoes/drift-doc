@@ -1102,8 +1102,8 @@ prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
 postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
 
 operator
-  : operator_head     {_input.get(_input.index()-1).getType()!=WS}? (operator_character)*
-  | dot_operator_head {_input.get(_input.index()-1).getType()!=WS}? (dot_operator_character)+
+  : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
+  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)+
   ;
 
 operator_character
