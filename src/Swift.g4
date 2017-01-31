@@ -201,8 +201,8 @@ compilation_condition
  | boolean_literal
  | '(' compilation_condition ')'
  | '!' compilation_condition
- | compilation_condition '&&' compilation_condition
- | compilation_condition '||' compilation_condition
+// | compilation_condition '&&' compilation_condition TODO: conflicting operator
+// | compilation_condition '||' compilation_condition
  ;
 
 platform_condition
@@ -388,7 +388,7 @@ function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
-parameter : external_parameter_name? local_parameter_name type_annotation? '...'? default_argument_clause? ;
+parameter : external_parameter_name? local_parameter_name type_annotation? variadic_parameter_notation? default_argument_clause? ;
 external_parameter_name : identifier ;
 local_parameter_name : identifier ;
 default_argument_clause : assignment_operator expression  ;
@@ -775,7 +775,7 @@ closure_parameter_list : closure_parameter (',' closure_parameter)* ;
 
 closure_parameter
  : closure_parameter_name type_annotation?
- | closure_parameter_name type_annotation '...'
+ | closure_parameter_name type_annotation variadic_parameter_notation
  ;
 
 closure_parameter_name : identifier;
@@ -1074,6 +1074,10 @@ negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
 
 arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
 same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
+
+// Need to differentiate variadic parameter notation with range operator
+// when '...' is not a binary operator, it could signify variadic parameters.
+variadic_parameter_notation: {!SwiftSupport.isBinaryOp(_input)}? '.' '.' '.' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
