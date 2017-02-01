@@ -830,7 +830,7 @@ postfix_expression
  | postfix_expression '.' identifier generic_argument_clause?           # explicit_member_expression2
  | postfix_expression '.' identifier '(' argument_names ')'             # explicit_member_expression3
  | postfix_expression '.' 'self'                                        # postfix_self_expression
- | 'type' '(' 'of' ':' expression ')'                                   # dynamic_type_expression
+// | 'type' '(' 'of' ':' expression ')'                                   # dynamic_type_expression TODO: parameter name conflict
  | postfix_expression '[' expression_list ']'                           # subscript_expression
 // ! is a postfix operator already
 // | postfix_expression '!'                                             # forced_value_expression
@@ -950,7 +950,8 @@ Identifier
 
 identifier_list : identifier (',' identifier)* ;
 
-fragment Identifier_head : [a-zA-Z]
+fragment Identifier_head
+ : [a-zA-Z]
  | '_'
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
@@ -971,7 +972,9 @@ fragment Identifier_head : [a-zA-Z]
  */
  ;
 
-fragment Identifier_character : [0-9]
+fragment Identifier_character
+ : [0-9]
+ | '$' // dollars sign seems allowed as identifier character although it's not in grammar spec
  | [\u0300-\u036F] | [\u1DC0-\u1DFF] | [\u20D0-\u20FF] | [\uFE20-\uFE2F]
  | Identifier_head
  ;
@@ -1146,8 +1149,8 @@ Operator_following_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-dot_operator_head 		: '.' ;
-dot_operator_character  : '.' | operator_character ;
+dot_operator_head : '.' ;
+dot_operator_character : '.' | operator_character ;
 
 Implicit_parameter_name : '$' Decimal_digit+ ;
 
@@ -1243,8 +1246,8 @@ Interpolated_text_item
   | Quoted_text_item
   ;
 
-WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
+WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(2) ; // nesting comments allowed
+Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(2) ; // nesting comments allowed
 
-Line_comment : '//' .*? ('\n'|EOF)				-> channel(3) ;
+Line_comment : '//' .*? ('\n'|EOF) -> channel(3) ;
