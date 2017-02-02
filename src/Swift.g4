@@ -179,12 +179,12 @@ throw_statement : 'throw' expression ;
 
 compiler_control_statement
  : conditional_compilation_block
- | line_control_statement
+// | line_control_statement
  ;
 
 // GRAMMAR OF A BUILD CONFIGURATION STATEMENT
 
-conditional_compilation_block : if_directive_clause elseif_directive_clauses? else_directive_clause ;
+conditional_compilation_block : if_directive_clause elseif_directive_clauses? else_directive_clause? endif_directive ;
 if_directive_clause : if_directive compilation_condition statements? ;
 elseif_directive_clauses : elseif_directive_clause+ ;
 elseif_directive_clause : elseif_directive compilation_condition statements? ;
@@ -201,29 +201,29 @@ compilation_condition
  | boolean_literal
  | '(' compilation_condition ')'
  | '!' compilation_condition
- | compilation_condition '&&' compilation_condition
- | compilation_condition '||' compilation_condition
+// | compilation_condition '&&' compilation_condition TODO: conflicting operator
+// | compilation_condition '||' compilation_condition
  ;
 
 platform_condition
  : 'os' '(' operating_system ')'
  | 'arch' '(' architecture ')'
- | 'swift' '(' '>=' swift_version ')'
+// | 'swift' '(' '>=' swift_version ')' TODO: Disambiguate with operator
  ;
 
-operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' ;
+operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' | 'OSX' ; // OSX still seems allowed
 architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
 swift_version : Decimal_literal  '.' Decimal_literal ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
 
-line_control_statement
- : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
- | '#sourceLocation' '(' ')'
- ;
-
-line_number : Decimal_literal ;
-file_name : Static_string_literal ;
+//line_control_statement
+// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')' // TODO: line could be arg name
+// | '#sourceLocation' '(' ')'
+// ;
+//
+//line_number : Decimal_literal ;
+//file_name : Static_string_literal ;
 
 // GRAMMAR OF AN AVAILABILITY CONDITION
 
@@ -239,6 +239,7 @@ fragment
 Platform_name
  : 'iOS' | 'iOSApplicationExtension'
  | 'macOS' | 'macOSApplicationExtension'
+ | 'OSX' | 'OSXApplicationExtension' // still allowed in swift 3.0
  | 'watchOS'
  | 'tvOS'
  ;
@@ -254,24 +255,27 @@ Platform_version
 
 // GRAMMAR OF A GENERIC PARAMETER CLAUSE
 
-generic_parameter_clause : '<' generic_parameter_list requirement_clause? '>'  ;
-generic_parameter_list : generic_parameter (',' generic_parameter)*  ;
+generic_parameter_clause : '<' generic_parameter_list '>' ;
+generic_parameter_list : generic_parameter (',' generic_parameter)* ;
 generic_parameter
  : type_name
  | type_name ':' type_identifier
  | type_name ':' protocol_composition_type
  ;
 
-requirement_clause : 'where' requirement_list  ;
-requirement_list : requirement | requirement ',' requirement_list  ;
-requirement : conformance_requirement | same_type_requirement  ;
+generic_where_clause : 'where' requirement_list ;
+requirement_list : requirement | requirement ',' requirement_list ;
+requirement : conformance_requirement | same_type_requirement ;
 
-conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier same_type_equals type  ;
+conformance_requirement
+ : type_identifier ':' type_identifier
+ | type_identifier ':' protocol_composition_type
+ ;
+same_type_requirement : type_identifier same_type_equals type ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
-generic_argument_clause : '<' generic_argument_list '>'  ;
+generic_argument_clause : '<' generic_argument_list '>' ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type ;
 
@@ -385,7 +389,7 @@ function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
-parameter : external_parameter_name? local_parameter_name type_annotation? '...'? default_argument_clause? ;
+parameter : external_parameter_name? local_parameter_name type_annotation? variadic_parameter_notation? default_argument_clause? ;
 external_parameter_name : identifier ;
 local_parameter_name : identifier ;
 default_argument_clause : assignment_operator expression  ;
@@ -450,7 +454,7 @@ protocol_member
  | protocol_initializer_declaration
  | protocol_subscript_declaration
  | protocol_associated_type_declaration
- | type_alias_declaration
+ | typealias_declaration
  ;
 
 // GRAMMAR OF A PROTOCOL PROPERTY DECLARATION
@@ -497,8 +501,14 @@ deinitializer_declaration : attributes? 'deinit' code_block  ;
 
 // GRAMMAR OF AN EXTENSION DECLARATION
 
-extension_declaration : access_level_modifier? 'extension' type_identifier type_inheritance_clause? extension_body  ;
-extension_body : '{' declarations?'}'  ;
+extension_declaration
+ : attribute? access_level_modifier? 'extension' type_identifier type_inheritance_clause? extension_body
+ | attribute? access_level_modifier? 'extension' type_identifier generic_where_clause extension_body
+ ;
+extension_body : '{' extension_members? '}' ;
+
+extension_members : extension_member+ ;
+extension_member : declaration | compiler_control_statement ;
 
 // GRAMMAR OF A SUBSCRIPT DECLARATION
 
@@ -508,32 +518,66 @@ subscript_declaration
  | subscript_head subscript_result getter_setter_keyword_block
  ;
 
-subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : arrow_operator attributes? type  ;
+subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause ;
+subscript_result : arrow_operator attributes? type ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
-prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
-postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
-infix_operator_attributes : precedence_clause? associativity_clause? ;
-precedence_clause : 'precedence' precedence_level ;
-precedence_level : integer_literal ;
-associativity_clause : 'associativity' associativity ;
-associativity : 'left' | 'right' | 'none' ;
+
+prefix_operator_declaration : 'prefix' 'operator' operator ;
+postfix_operator_declaration : 'postfix' 'operator' operator ;
+infix_operator_declaration : 'infix' 'operator' operator infix_operator_group? ;
+
+infix_operator_group : precedence_group_name ;
+
+// GRAMMAR OF A PRECEDENCE GROUP DECLARATION
+
+precedence_group_declaration : 'precedencegroup' precedence_group_name '{' precedence_group_attributes? '}' ;
+
+precedence_group_attributes : precedence_group_attribute precedence_group_attributes? ;
+precedence_group_attribute
+ : precedence_group_relation
+ | precedence_group_assignment
+ | precedence_group_associativity
+ ;
+
+precedence_group_relation
+ : 'higherThan' ':' precedence_group_names
+ | 'lowerThan' ':' precedence_group_names
+ ;
+
+precedence_group_assignment : 'assignment' ':' boolean_literal ;
+
+precedence_group_associativity
+ : 'associativity' ':' 'left'
+ | 'associativity' ':' 'right'
+ | 'associativity' ':' 'none'
+ ;
+
+precedence_group_names : precedence_group_name | precedence_group_name ',' precedence_group_names ;
+precedence_group_name : identifier ;
 
 // GRAMMAR OF A DECLARATION MODIFIER
+
 declaration_modifier
- : 'class' | 'convenience' | 'dynamic' | 'final' | 'infix' | 'lazy' | 'mutating' | 'nonmutating' | 'optional' | 'override' | 'postfix' | 'prefix' | 'required' | 'static' | 'unowned' | 'unowned' '(' 'safe' ')' | 'unowned' '(' 'unsafe' ')' | 'weak'
+ : 'class' | 'convenience' | 'dynamic' | 'final' | 'infix' | 'lazy' | 'optional' | 'override' | 'postfix' | 'prefix' | 'required' | 'static' | 'unowned' | 'unowned' '(' 'safe' ')' | 'unowned' '(' 'unsafe' ')' | 'weak'
  | access_level_modifier
+ | mutation_modifier
  ;
 declaration_modifiers : declaration_modifier declaration_modifiers? ;
 
 access_level_modifier
  : 'internal' | 'internal' '(' 'set' ')'
  | 'private' | 'private' '(' 'set' ')'
+ | 'fileprivate' | 'fileprivate' '(' 'set' ')'
  | 'public' | 'public' '(' 'set' ')'
+ | 'open' | 'open' '(' 'set' ')'
+ ;
+
+mutation_modifier
+ : 'mutating'
+ | 'nonmutating'
  ;
 
 // Patterns
@@ -567,16 +611,15 @@ value_binding_pattern : 'var' pattern | 'let' pattern  ;
 // GRAMMAR OF A TUPLE PATTERN
 
 tuple_pattern : '(' tuple_pattern_element_list? ')'  ;
-tuple_pattern_element_list
-	:	tuple_pattern_element (',' tuple_pattern_element)*
-	;
-tuple_pattern_element : pattern  ;
+tuple_pattern_element_list :	tuple_pattern_element (',' tuple_pattern_element)* ;
+tuple_pattern_element : pattern | identifier ':' pattern ;
 
 // GRAMMAR OF AN ENUMERATION CASE PATTERN
 
-enum_case_pattern : type_identifier? '.' enum_case_name tuple_pattern? ;
+enum_case_pattern : type_identifier '.' enum_case_name tuple_pattern? ;
 
 // GRAMMAR OF AN OPTIONAL PATTERN
+
 optional_pattern : identifier_pattern '?' ;
 
 // GRAMMAR OF A TYPE CASTING PATTERN
@@ -592,17 +635,18 @@ expression_pattern : expression  ;
 
 // GRAMMAR OF AN ATTRIBUTE
 
-attribute : '@'? attribute_name attribute_argument_clause? ;
+attribute : '@' attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
 attributes : attribute+ ;
+
 balanced_tokens : balanced_token+ ;
 balanced_token
  : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | operator
-// | Any punctuation except ( ,  ')' , '[' , ']' , { , or } TODO add?
+ | identifier | context_sensitive_keyword | literal | operator
+ // TODO: | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
 
 // Expressions
@@ -732,7 +776,7 @@ closure_parameter_list : closure_parameter (',' closure_parameter)* ;
 
 closure_parameter
  : closure_parameter_name type_annotation?
- | closure_parameter_name type_annotation '...'
+ | closure_parameter_name type_annotation variadic_parameter_notation
  ;
 
 closure_parameter_name : identifier;
@@ -787,7 +831,7 @@ postfix_expression
  | postfix_expression '.' identifier generic_argument_clause?           # explicit_member_expression2
  | postfix_expression '.' identifier '(' argument_names ')'             # explicit_member_expression3
  | postfix_expression '.' 'self'                                        # postfix_self_expression
- | 'type' '(' 'of' ':' expression ')'                                   # dynamic_type_expression
+// | 'type' '(' 'of' ':' expression ')'                                   # dynamic_type_expression TODO: parameter name conflict
  | postfix_expression '[' expression_list ']'                           # subscript_expression
 // ! is a postfix operator already
 // | postfix_expression '!'                                             # forced_value_expression
@@ -907,7 +951,8 @@ Identifier
 
 identifier_list : identifier (',' identifier)* ;
 
-fragment Identifier_head : [a-zA-Z]
+fragment Identifier_head
+ : [a-zA-Z]
  | '_'
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
@@ -928,7 +973,9 @@ fragment Identifier_head : [a-zA-Z]
  */
  ;
 
-fragment Identifier_character : [0-9]
+fragment Identifier_character
+ : [0-9]
+ | '$' // dollars sign seems allowed as identifier character although it's not in grammar spec
  | [\u0300-\u036F] | [\u1DC0-\u1DFF] | [\u20D0-\u20FF] | [\uFE20-\uFE2F]
  | Identifier_head
  ;
@@ -991,22 +1038,48 @@ From doc on operators:
  misinterpreted as a bit shift >> operator.
 */
 
-//operator : Binary_operator | Prefix_operator | Postfix_operator ;
-
 /* these following tokens are also a Binary_operator so much come first as special case */
 
 assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
+
+DOT    	: '.' ;
+LCURLY 	: '{' ;
+LPAREN 	: '(' ;
+LBRACK 	: '[' ;
+RCURLY 	: '}' ;
+RPAREN 	: ')' ;
+RBRACK 	: ']' ;
+COMMA  	: ',' ;
+COLON  	: ':' ;
+SEMI   	: ';' ;
+LT 		: '<' ;
+GT 		: '>' ;
+UNDERSCORE : '_' ;
+BANG 	: '!' ;
+QUESTION: '?' ;
+AT 		: '@' ;
+AND 	: '&' ;
+SUB 	: '-' ;
+EQUAL 	: '=' ;
+OR 		: '|' ;
+DIV 	: '/' ;
+ADD 	: '+' ;
+MUL 	: '*' ;
+MOD 	: '%' ;
+CARET 	: '^' ;
+TILDE 	: '~' ;
 
 /** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
  *  as specifically a negation prefix op.
  */
 negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
 
-build_AND 		: {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
-build_OR  		: {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
 arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
-range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
 same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
+
+// Need to differentiate variadic parameter notation with range operator
+// when '...' is not a binary operator, it could signify variadic parameters.
+variadic_parameter_notation: {!SwiftSupport.isBinaryOp(_input)}? '.' '.' '.' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
@@ -1036,7 +1109,7 @@ postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
 
 operator
   : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
-  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
+  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)+
   ;
 
 operator_character
@@ -1075,8 +1148,8 @@ Operator_following_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-dot_operator_head 		: '.' ;
-dot_operator_character  : '.' | operator_character ;
+dot_operator_head : '.' ;
+dot_operator_character : '.' | operator_character ;
 
 Implicit_parameter_name : '$' Decimal_digit+ ;
 
@@ -1172,8 +1245,8 @@ Interpolated_text_item
   | Quoted_text_item
   ;
 
-WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
+WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(2) ; // nesting comments allowed
+Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(2) ; // nesting comments allowed
 
-Line_comment : '//' .*? ('\n'|EOF)				-> channel(3) ;
+Line_comment : '//' .*? ('\n'|EOF) -> channel(3) ;
