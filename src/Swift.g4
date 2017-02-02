@@ -184,7 +184,7 @@ compiler_control_statement
 
 // GRAMMAR OF A BUILD CONFIGURATION STATEMENT
 
-conditional_compilation_block : if_directive_clause elseif_directive_clauses? else_directive_clause ;
+conditional_compilation_block : if_directive_clause elseif_directive_clauses? else_directive_clause? endif_directive ;
 if_directive_clause : if_directive compilation_condition statements? ;
 elseif_directive_clauses : elseif_directive_clause+ ;
 elseif_directive_clause : elseif_directive compilation_condition statements? ;
@@ -211,14 +211,14 @@ platform_condition
 // | 'swift' '(' '>=' swift_version ')' TODO: Disambiguate with operator
  ;
 
-operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' ;
+operating_system : 'macOX' | 'iOS' | 'watchOS' | 'tvOS' | 'OSX' ; // OSX still seems allowed
 architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
 swift_version : Decimal_literal  '.' Decimal_literal ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
-//
+
 //line_control_statement
-// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')' TODO: line could be arg name
+// : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')' // TODO: line could be arg name
 // | '#sourceLocation' '(' ')'
 // ;
 //
@@ -239,6 +239,7 @@ fragment
 Platform_name
  : 'iOS' | 'iOSApplicationExtension'
  | 'macOS' | 'macOSApplicationExtension'
+ | 'OSX' | 'OSXApplicationExtension' // still allowed in swift 3.0
  | 'watchOS'
  | 'tvOS'
  ;
@@ -1036,8 +1037,6 @@ From doc on operators:
  characters are not treated as a single token that may then be
  misinterpreted as a bit shift >> operator.
 */
-
-//operator : Binary_operator | Prefix_operator | Postfix_operator ;
 
 /* these following tokens are also a Binary_operator so much come first as special case */
 
