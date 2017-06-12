@@ -9,7 +9,8 @@ let package = Package(
         Target(name: "DriftRuntime", dependencies: [])
     ],
     dependencies: [
-        .Package(url: "/private/tmp/Antlr4-tmp-1495863355", majorVersion: 4),
-        .Package(url: "https://github.com/hanjoes/git.git", majorVersion: 1)
+        .Package(url: "/private/tmp/Antlr4-tmp-1497122168", majorVersion: 4),
+        .Package(url: "https://github.com/hanjoes/git.git", Version(1, 0, 2)),
+        .Package(url: "https://github.com/hanjoes/BitSet.git", Version(1, 0, 3))
     ]
 )

@@ -62,11 +62,11 @@ statements
     : statements_impl[-1]
     ;
     
-statements_impl[int indexBefore]
+statements_impl[indexBefore: Int]
 locals [
    int indexAfter = -1
 ]
-    : {SwiftSupport.isSeparatedStatement(_input, $indexBefore)}? statement {$indexAfter = _input.index();} statements_impl[$indexAfter]?
+    : {try SwiftSupport.isSeparatedStatement(_input, $indexBefore)}? statement {$indexAfter = _input.index();} statements_impl[$indexAfter]?
     ;
 
 // GRAMMAR OF A LOOP STATEMENT
@@ -739,8 +739,8 @@ balanced_token
 any_punctuation_for_balanced_token :
     ( '.' | ',' | ':' | ';' | '=' | '@' | '#' | '`' | '?' )
     | arrow_operator
-    | {SwiftSupport.isPrefixOp(_input)}? '&'
-    | {SwiftSupport.isPostfixOp(_input)}? '!'
+    | {try SwiftSupport.isPrefixOp(_input)}? '&'
+    | {try SwiftSupport.isPostfixOp(_input)}? '!'
     ;
 
 // Expressions
@@ -1416,7 +1416,7 @@ From doc on operators:
 
 /* these following tokens are also a Binary_operator so much come first as special case */
 
-assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
+assignment_operator : {try SwiftSupport.isBinaryOp(_input)}? '=' ;
 
 DOT    	: '.' ;
 LCURLY 	: '{' ;
@@ -1448,28 +1448,28 @@ TILDE 	: '~' ;
 /** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
  *  as specifically a negation prefix op.
  */
-negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
+negate_prefix_operator : {try SwiftSupport.isPrefixOp(_input)}? '-';
 
-compilation_condition_AND : {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
-compilation_condition_OR  : {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
-compilation_condition_GE  : {SwiftSupport.isOperator(_input,">=")}?  '>' '=' ;
-arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
-range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
-same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
+compilation_condition_AND : {try SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
+compilation_condition_OR  : {try SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
+compilation_condition_GE  : {try SwiftSupport.isOperator(_input,">=")}?  '>' '=' ;
+arrow_operator	: {try SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
+range_operator	: {try SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
+same_type_equals: {try SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator_rule ;
+binary_operator : {try SwiftSupport.isBinaryOp(_input)}? operator_rule ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator_rule ;
+prefix_operator : {try SwiftSupport.isPrefixOp(_input)}? operator_rule ;
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
@@ -1481,11 +1481,11 @@ prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator_rule ;
  the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
  rather than a ++ .b)."
  */
-postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator_rule ;
+postfix_operator : {try SwiftSupport.isPostfixOp(_input)}? operator_rule ;
 
 operator_rule
-  : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
-  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
+  : operator_head     ({try _input.get(_input.index()-1).getType() != Swift3Parser.Tokens.WS.rawValue}? operator_character)*
+  | dot_operator_head ({try _input.get(_input.index()-1).getType() != Swift3Parser.Tokens.WS.rawValue}? dot_operator_character)*
   ;
 
 operator_character
