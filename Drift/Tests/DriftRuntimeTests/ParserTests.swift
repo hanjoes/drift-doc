@@ -1,6 +1,7 @@
 import XCTest
 import GitRuntime
 import Antlr4
+import DriftRuntime
 
 class ParserTests: XCTestCase {
     
@@ -13,11 +14,17 @@ class ParserTests: XCTestCase {
     
     fileprivate static let ResourceURL = "https://github.com/hanjoes/antlr4.git"
     
-    func testOne() {
-        print(ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir).joined(separator: "\n"))
-    }
-    
-    func testTwo() {
+    func testParsingWithNoError() throws {
+        let inputFiles = ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir)
+        _ = try inputFiles.map {
+            inputFile in
+            print("handling \(inputFile)")
+            let fileStream = ANTLRFileStream(inputFile)
+            let lexer = Swift3Lexer(fileStream)
+            let tokenStream = CommonTokenStream(lexer)
+            let parser = try Swift3Parser(tokenStream)
+            try parser.top_level()
+        }
     }
     
 }
@@ -46,7 +53,9 @@ private extension ParserTests {
     
     static func ensure(folderAt path: String) {
         if !ParserTests.fileManager.fileExists(atPath: path) {
-            try! ParserTests.fileManager.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+            try! ParserTests.fileManager.createDirectory(atPath: path,
+                                                         withIntermediateDirectories: false,
+                                                         attributes: nil)
         }
     }
     
@@ -71,4 +80,13 @@ private extension ParserTests {
         ParserTests.fileManager.fileExists(atPath: path, isDirectory: &isDirectory)
         return isDirectory.boolValue
     }
+    
+    func parse(file: String) throws {
+        let fileStream = ANTLRFileStream(file)
+        let lexer = Swift3Lexer(fileStream)
+        let tokenStream = CommonTokenStream(lexer)
+        let parser = try Swift3Parser(tokenStream)
+        try parser.top_level()
+    }
+
 }
