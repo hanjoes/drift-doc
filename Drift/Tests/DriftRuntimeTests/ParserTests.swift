@@ -16,15 +16,17 @@ class ParserTests: XCTestCase {
     
     func testParsingWithNoError() throws {
         let inputFiles = ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir)
-        _ = try inputFiles.map {
-            inputFile in
-            print("handling \(inputFile)")
-            let fileStream = ANTLRFileStream(inputFile)
+//        _ = try inputFiles.map {
+//            inputFile in
+//            print("handling \(inputFile)")
+            let fileStream = ANTLRFileStream("/tmp/drift-tests-12-22/repo//runtime/Swift/Sources/Antlr4/atn/ATNDeserializer.swift")
             let lexer = Swift3Lexer(fileStream)
             let tokenStream = CommonTokenStream(lexer)
             let parser = try Swift3Parser(tokenStream)
-            try parser.top_level()
-        }
+            let walker = ParseTreeWalker()
+            try walker.walk(Swift3BaseListener(), parser.top_level())
+//            try parser.top_level()
+//        }
     }
     
 }
