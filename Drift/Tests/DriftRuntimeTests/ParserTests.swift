@@ -15,17 +15,22 @@ class ParserTests: XCTestCase {
     fileprivate static let ResourceURL = "https://github.com/hanjoes/antlr4.git"
     
     func testParsingWithNoError() throws {
-        let inputFiles = ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir)
+//        let inputFiles = ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir)
+//        print(inputFiles.joined(separator: "\n"))
 //        _ = try inputFiles.map {
 //            inputFile in
 //            print("handling \(inputFile)")
-            let fileStream = ANTLRFileStream("/tmp/drift-tests-12-22/repo//runtime/Swift/Sources/Antlr4/atn/ATNDeserializer.swift")
+            let fileStream = ANTLRFileStream("/tmp/drift-tests-22-22/repo//runtime/Swift/Sources/Antlr4/atn/ATNDeserializer.swift")
             let lexer = Swift3Lexer(fileStream)
             let tokenStream = CommonTokenStream(lexer)
             let parser = try Swift3Parser(tokenStream)
             let walker = ParseTreeWalker()
-            try walker.walk(Swift3BaseListener(), parser.top_level())
-//            try parser.top_level()
+//            try walker.walk(Swift3BaseListener(), parser.top_level())
+            let start = DispatchTime.now().uptimeNanoseconds
+            try parser.top_level()
+            let end = DispatchTime.now().uptimeNanoseconds
+            let spent = Double(end - start) / 1_000
+            print("Spent end \(end) - start \(start) = \(spent) usecs...")
 //        }
     }
     
