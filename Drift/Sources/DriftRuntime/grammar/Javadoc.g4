@@ -53,11 +53,11 @@ standard_tags
   ;
   
 standard_tag
-  : '@' Standard_tag_name description
+  : '@' Character+
   ;
 
 inline_tag
-  : '{' '@' Inline_tag_name description '}'
+  : '{' '@' Character+ '}'
   ; 
   
 // Comments are written in HTML - The text must be written in HTML, in that they
@@ -74,10 +74,19 @@ description_component
 
 plain_text: Character+;
 
-// TOOD: Support attribute.
+// Fuzzy match of HTML elements.
+// Some of the element names are too general (like a), and seem to
+// mess up the grammar.
 html_element
-  : '<' HTML_tag '>'
-  | '<' '/' HTML_tag '>'
+  : '<' Character+ '>'
+  | '<' '/' Character+ '>'
+  ;
+
+// TODO: Other wide languages like Chinese?
+// Character rule goes before tag names to allow tag names as part of
+// description.
+Character
+  : ~[@<>{} \n\r\t\u000B\u000C\u0000]
   ;
   
 // +--------------+-------------+
@@ -105,147 +114,4 @@ html_element
 // |@version      | 1.0         |
 // +--------------+-------------+
   
-Standard_tag_name
-  : 'author'
-  | 'deprecated'
-  | 'exception'
-  | 'param'
-  | 'return'
-  | 'see'
-  | 'serial'
-  | 'serialData'
-  | 'serialField'
-  | 'since'
-  | 'throws'
-  | 'version'
-  ;
-  
-Inline_tag_name
-  : 'code'
-  | 'docRoot'
-  | 'inheritDoc'
-  | 'link'
-  | 'linkplain'
-  | 'literal'
-  | 'value'
-  ;
-  
 WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN);
-
-// TODO: Other wide languages like Chinese?
-Character
-  : [\u0000-\uFFFF]
-  ;
-  
-  
-HTML_tag
-  : '!DOCTYPE'
-  | 'a'
-  | 'abbr'
-  | 'address'
-  | 'area'
-  | 'article'
-  | 'aside'
-  | 'audio'
-  | 'b'
-  | 'base'
-  | 'bdi'
-  | 'bdo'
-  | 'blockquote'
-  | 'body'
-  | 'br'
-  | 'button'
-  | 'canvas'
-  | 'caption'
-  | 'cite'
-  | 'code'
-  | 'col'
-  | 'colgroup'
-  | 'command'
-  | 'datalist'
-  | 'dd'
-  | 'del'
-  | 'details'
-  | 'dfn'
-  | 'div'
-  | 'dl'
-  | 'dt'
-  | 'em'
-  | 'embed'
-  | 'fieldset'
-  | 'figcaption'
-  | 'figure'
-  | 'footer'
-  | 'form'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'h5'
-  | 'h6'
-  | 'head'
-  | 'header'
-  | 'hgroup'
-  | 'hr'
-  | 'html'
-  | 'i'
-  | 'iframe'
-  | 'img'
-  | 'input'
-  | 'ins'
-  | 'kbd'
-  | 'keygen'
-  | 'label'
-  | 'legend'
-  | 'li'
-  | 'link'
-  | 'map'
-  | 'mark'
-  | 'menu'
-  | 'meta'
-  | 'meter'
-  | 'nav'
-  | 'noscript'
-  | 'object'
-  | 'ol'
-  | 'optgroup'
-  | 'option'
-  | 'output'
-  | 'p'
-  | 'param'
-  | 'pre'
-  | 'progress'
-  | 'q'
-  | 'rp'
-  | 'rt'
-  | 'ruby'
-  | 's'
-  | 'samp'
-  | 'script'
-  | 'section'
-  | 'select'
-  | 'small'
-  | 'source'
-  | 'span'
-  | 'strong'
-  | 'style'
-  | 'sub'
-  | 'summary'
-  | 'sup'
-  | 'table'
-  | 'tbody'
-  | 'td'
-  | 'textarea'
-  | 'tfoot'
-  | 'th'
-  | 'thead'
-  | 'time'
-  | 'title'
-  | 'tr'
-  | 'track'
-  | 'u'
-  | 'ul'
-  | 'var'
-  | 'video'
-  | 'wbr'
-  ;
