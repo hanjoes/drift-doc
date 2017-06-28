@@ -1,5 +1,15 @@
 grammar Javadoc;
 
+
+file : file_element*;
+
+file_element
+  : {Support.lookAheadJavaDoc(_input)}? javadoc
+  | code
+  ;
+
+code : plain_text;
+
 // Based on javadoc manpage.
 
 // A comment is a description followed by tags - The description begins after 
@@ -11,7 +21,7 @@ grammar Javadoc;
 // It is possible to have a comment with only tags and no description.  
 // The description cannot  continue after  the  tag  section begins.
 javadoc
-  : description tag_section
+  : Doc_start description tag_section Doc_end
   ;
 
 tag_section
@@ -79,14 +89,22 @@ plain_text: Character+;
 // mess up the grammar.
 html_element
   : '<' Character+ '>'
-  | '<' '/' Character+ '>'
+  | '</' Character+ '>'
   ;
 
 // TODO: Other wide languages like Chinese?
 // Character rule goes before tag names to allow tag names as part of
 // description.
 Character
-  : ~[@<>{} \n\r\t\u000B\u000C\u0000]
+  : ~[\n\r\t\u000B\u000C\u0000]
+  ;
+  
+Doc_start
+  : '/**' '*'*
+  ;
+  
+Doc_end
+  : '*'* '*/'
   ;
   
 // +--------------+-------------+
