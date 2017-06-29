@@ -1,10 +1,9 @@
 grammar Javadoc;
 
-
 file : file_element*;
 
 file_element
-  : {Support.lookAheadJavaDoc(_input)}? javadoc
+  : javadoc
   | code
   ;
 
@@ -63,11 +62,15 @@ standard_tags
   ;
   
 standard_tag
-  : '@' Character+
+  : '@' tag_name description
+  ;
+
+tag_name
+  : Printable+
   ;
 
 inline_tag
-  : '{' '@' Character+ '}'
+  : '{' '@' tag_name description '}'
   ; 
   
 // Comments are written in HTML - The text must be written in HTML, in that they
@@ -77,26 +80,25 @@ description_components
   ;
 
 description_component
-  : plain_text 
-  | html_element
+  : html_element
+  | plain_text
   | inline_tag
   ;
 
-plain_text: Character+;
+plain_text: Printable+;
 
 // Fuzzy match of HTML elements.
 // Some of the element names are too general (like a), and seem to
 // mess up the grammar.
 html_element
-  : '<' Character+ '>'
-  | '</' Character+ '>'
+  : '<' Printable+ '>'
+  | '</' Printable+ '>'
   ;
 
 // TODO: Other wide languages like Chinese?
-// Character rule goes before tag names to allow tag names as part of
-// description.
-Character
-  : ~[\n\r\t\u000B\u000C\u0000]
+
+Printable
+  : ~[ \n\r\t\u000B\u000C\u0000]
   ;
   
 Doc_start
