@@ -1,6 +1,6 @@
 grammar Javadoc;
 
-file : file_element*;
+file : file_element* EOF;
 
 file_element
   : javadoc
@@ -56,7 +56,6 @@ description
 // Some of the tags below could contain other tags, thus using description
 // would be safe because description is the most comprehensive text 
 // representation in this grammar.
-
 standard_tags
   : standard_tag*
   ;
@@ -65,50 +64,10 @@ standard_tag
   : '@' tag_name description
   ;
 
-tag_name
-  : Printable+
-  ;
-
 inline_tag
   : '{' '@' tag_name description '}'
-  ; 
-  
-// Comments are written in HTML - The text must be written in HTML, in that they
-// should use HTML entities  and  HTML  tags.
-description_components
-  : description_component*
   ;
 
-description_component
-  : html_element
-  | plain_text
-  | inline_tag
-  ;
-
-plain_text: Printable+;
-
-// Fuzzy match of HTML elements.
-// Some of the element names are too general (like a), and seem to
-// mess up the grammar.
-html_element
-  : '<' Printable+ '>'
-  | '</' Printable+ '>'
-  ;
-
-// TODO: Other wide languages like Chinese?
-
-Printable
-  : ~[ \n\r\t\u000B\u000C\u0000]
-  ;
-  
-Doc_start
-  : '/**' '*'*
-  ;
-  
-Doc_end
-  : '*'* '*/'
-  ;
-  
 // +--------------+-------------+
 // |     Tag      | Introduced  |
 // |              | in JDK      |
@@ -133,5 +92,61 @@ Doc_end
 // |{@value}      | 1.4         |
 // |@version      | 1.0         |
 // +--------------+-------------+
+tag_name
+  :'author'
+  |'code'
+  |'docRoot'
+  |'deprecated'
+  |'exception'
+  |'inheritDoc'
+  |'link'
+  |'linkplain'
+  |'literal'
+  |'param'
+  |'return'
+  |'see'
+  |'serial'
+  |'serialData'
+  |'serialField'
+  |'since'
+  |'throws'
+  |'value'
+  |'version'
+  ;
+
+// Comments are written in HTML - The text must be written in HTML, in that they
+// should use HTML entities  and  HTML  tags.
+description_components
+  : description_component*
+  ;
+
+description_component
+  : html_element
+  | plain_text
+  | inline_tag
+  ;
+
+plain_text: Printable+;
+
+// Fuzzy match of HTML elements.
+// Some of the element names are too general (like a), and seem to
+// mess up the grammar.
+html_element
+  : '<' Printable+ '>'
+  | '</' Printable+ '>'
+  ;
+
+// TODO: Other languages?
+Printable
+  : ~[ \n\r\t\u000B\u000C\u0000]
+  ;
   
+Doc_start
+  : '/**' '*'*
+  ;
+  
+Doc_end
+  : '*'* '*/'
+  ;
+
 WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN);
