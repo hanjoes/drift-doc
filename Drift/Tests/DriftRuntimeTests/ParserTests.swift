@@ -88,7 +88,7 @@ private extension ParserTests {
         let lexer = JavadocLexer(fileStream)
         let tokenStream = CommonTokenStream(lexer)
         let parser = try JavadocParser(tokenStream)
-        try parser.top_level()
+        try parser.file()
     }
 
 }

@@ -1,4 +1,6 @@
-grammar Javadoc;
+parser grammar JavadocParser;
+
+options { tokenVocab=JavadocLexer; }
 
 file : file_element* EOF;
 
@@ -7,7 +9,7 @@ file_element
   | code
   ;
 
-code : plain_text;
+code : Printable+;
 
 // Based on javadoc manpage.
 
@@ -20,13 +22,9 @@ code : plain_text;
 // It is possible to have a comment with only tags and no description.  
 // The description cannot  continue after  the  tag  section begins.
 javadoc
-  : Doc_start description tag_section Doc_end
+  : Doc_start description Doc_ws tag_section Doc_end
   ;
 
-tag_section
-  : standard_tags
-  ;
-  
 description
   : description_components
   ;
@@ -56,62 +54,21 @@ description
 // Some of the tags below could contain other tags, thus using description
 // would be safe because description is the most comprehensive text 
 // representation in this grammar.
+
+tag_section
+  : standard_tags
+  ;
+
 standard_tags
   : standard_tag*
   ;
   
 standard_tag
-  : '@' tag_name description
+  : Tag_start Doc_ws description
   ;
 
 inline_tag
-  : '{' '@' tag_name description '}'
-  ;
-
-// +--------------+-------------+
-// |     Tag      | Introduced  |
-// |              | in JDK      |
-// +--------------+-------------+
-// |@author       | 1.0         |
-// |{@code}       | 1.5         |
-// |{@docRoot}    | 1.3         |
-// |@deprecated   | 1.0         |
-// |@exception    | 1.0         |
-// |{@inheritDoc} | 1.4         |
-// |{@link}       | 1.2         |
-// |{@linkplain}  | 1.4         |
-// |{@literal}    | 1.5         |
-// |@param        | 1.0         |
-// |@return       | 1.0         |
-// |@see          | 1.0         |
-// |@serial       | 1.2         |
-// |@serialData   | 1.2         |
-// |@serialField  | 1.2         |
-// |@since        | 1.1         |
-// |@throws       | 1.2         |
-// |{@value}      | 1.4         |
-// |@version      | 1.0         |
-// +--------------+-------------+
-tag_name
-  :'author'
-  |'code'
-  |'docRoot'
-  |'deprecated'
-  |'exception'
-  |'inheritDoc'
-  |'link'
-  |'linkplain'
-  |'literal'
-  |'param'
-  |'return'
-  |'see'
-  |'serial'
-  |'serialData'
-  |'serialField'
-  |'since'
-  |'throws'
-  |'value'
-  |'version'
+  : Open_brace Tag_start  Doc_ws inline_tag_components Doc_ws Close_brace
   ;
 
 // Comments are written in HTML - The text must be written in HTML, in that they
@@ -122,31 +79,23 @@ description_components
 
 description_component
   : html_element
-  | plain_text
   | inline_tag
+  | {Support.isNotTagOrHtml(_input)}? Doc_text
+  | Doc_ws
   ;
 
-plain_text: Printable+;
+inline_tag_components
+  : inline_tag_component*
+  ;
+
+inline_tag_component
+  : {Support.isNotTagOrHtml(_input)}? Doc_text
+  | html_element
+  ;
 
 // Fuzzy match of HTML elements.
 // Some of the element names are too general (like a), and seem to
 // mess up the grammar.
 html_element
-  : '<' Printable+ '>'
-  | '</' Printable+ '>'
+  : Html_open Doc_ws Doc_text Doc_ws Html_close
   ;
-
-// TODO: Other languages?
-Printable
-  : ~[ \n\r\t\u000B\u000C\u0000]
-  ;
-  
-Doc_start
-  : '/**' '*'*
-  ;
-  
-Doc_end
-  : '*'* '*/'
-  ;
-
-WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN);
