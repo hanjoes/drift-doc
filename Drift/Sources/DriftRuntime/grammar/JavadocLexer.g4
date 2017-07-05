@@ -16,8 +16,9 @@ fragment Doc_open
 
 mode JAVADOC;
 
+
 Doc_end
-  : Doc_close -> mode(DEFAULT_MODE)
+  : Doc_close  -> mode(DEFAULT_MODE)
   ;
 
 Tag_start
@@ -27,7 +28,7 @@ Tag_start
 Doc_ws : [ \n\r\t\u000B\u000C\u0000]+;
 
 Open_brace
-  : '{'
+  : '{' {Support.openBrace(getText())}?
   ;
 
 Close_brace
@@ -44,7 +45,7 @@ Html_close
   ;
 
 Doc_text
-  : Doc_printable+
+  : Doc_printable+ {Support.isNotTag(getText())}? {System.out.println(getText());}
   ;
 
 
@@ -53,7 +54,7 @@ fragment Doc_close
   ;
 
 fragment Doc_printable
-  : ~[ \n\r\t\u000B\u000C\u0000]
+  : ~[ <>{}@\n\r\t\u000B\u000C\u0000]
   ;
 
 // +--------------+-------------+
