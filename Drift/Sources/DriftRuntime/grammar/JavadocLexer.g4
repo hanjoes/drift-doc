@@ -54,7 +54,7 @@ fragment Doc_close
   ;
 
 fragment Doc_printable
-  : ~[ <>{}@\n\r\t\u000B\u000C\u0000]
+  : ~[ <>{}\n\r\t\u000B\u000C\u0000]
   ;
 
 // +--------------+-------------+
