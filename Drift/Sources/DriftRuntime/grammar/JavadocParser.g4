@@ -81,6 +81,10 @@ description_component
   : html_element
   | inline_tag
   | Doc_text
+  | Open_brace
+  | Close_brace
+  | Html_open
+  | Html_close
   ;
 
 inline_tag_component

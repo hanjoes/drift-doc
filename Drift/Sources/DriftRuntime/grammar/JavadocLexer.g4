@@ -28,7 +28,7 @@ Tag_start
 Doc_ws : [ \n\r\t\u000B\u000C\u0000]+;
 
 Open_brace
-  : '{' {Support.openBrace(getText())}?
+  : '{'
   ;
 
 Close_brace
@@ -45,7 +45,7 @@ Html_close
   ;
 
 Doc_text
-  : Doc_printable+ {Support.isNotTag(getText())}? {System.out.println(getText());}
+  : Doc_printable+
   ;
 
 
