@@ -23,7 +23,7 @@ import java.util.Set;
  * <p>some text</p>
  *
  * @param howdy! <p>should break</p>
- * @param hanzhou {@version 12345}
+ * @param hanzhou {@version 12345 <head>sometext</head>}
  * <pre>
  * ctorBody
  *   : '{' superCall? stat* '}'
