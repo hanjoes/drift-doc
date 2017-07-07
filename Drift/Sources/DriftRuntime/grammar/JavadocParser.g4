@@ -70,12 +70,12 @@ description_components
   ;
 
 inline_tag
-  : {Support.dummy(_input)}? Open_brace Tag_start (Doc_ws? inline_tag_component+ Doc_ws?)*? Close_brace
+  : Open_brace Tag_start (Doc_ws? inline_tag_component+ Doc_ws?)*? Close_brace
   ;
 
 description_component
   : html_element
-  | {Support.dummy(_input) && Support.isNotInlineTagStart(_input)}? Open_brace
+  | {Support.isNotInlineTagStart(_input)}? Open_brace
 //  |  Open_brace
   | inline_tag
   | Close_brace
