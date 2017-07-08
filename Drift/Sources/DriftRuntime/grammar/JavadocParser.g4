@@ -74,23 +74,22 @@ inline_tag
   ;
 
 description_component
-  : html_element
-  | {Support.isNotInlineTagStart(_input)}? Open_brace
-//  |  Open_brace
-  | inline_tag
-  | Close_brace
-  | Html_open
-  | Html_close
-  | Doc_text
+  : html_element                                      # HTML
+  | {Support.isNotInlineTagStart(_input)}? Open_brace # OpenBrace
+  | inline_tag                                        # InlineTag
+  | Close_brace                                       # CloseBrace
+  | Html_open                                         # HTMLOpen
+  | Html_close                                        # HTMLClose
+  | Doc_text                                          # DocText
   ;
 
 inline_tag_component
-  : html_element
-  | Open_brace
-  | Close_brace
-  | Html_open
-  | Html_close
-  | Doc_text
+  : html_element                                      # InlineTagHTML
+  | Open_brace                                        # InlineTagOpenBrace
+  | Close_brace                                       # InlineTagCloseBrace
+  | Html_open                                         # InlineTagHTMLOpen
+  | Html_close                                        # InlineTagHTMLClose
+  | Doc_text                                          # InlineTagHTMLDocText
   ;
 
 // Fuzzy match of HTML elements.
