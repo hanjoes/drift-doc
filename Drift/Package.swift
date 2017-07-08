@@ -9,6 +9,6 @@ let package = Package(
         Target(name: "DriftRuntime", dependencies: [])
     ],
     dependencies: [
-        .Package(url: "/private/tmp/Antlr4-tmp-1499401188", majorVersion: 4)
+        .Package(url: "Antlr4", majorVersion: 4)
     ]
 )
