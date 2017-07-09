@@ -60,7 +60,7 @@ standard_tags
   ;
 
 standard_tag
-  : Tag_start description_components
+  : tag=Tag_start description_components
   ;
 
 // Comments are written in HTML - The text must be written in HTML, in that they
@@ -70,7 +70,7 @@ description_components
   ;
 
 inline_tag
-  : Open_brace Tag_start (Doc_ws? inline_tag_component+ Doc_ws?)*? Close_brace
+  : Open_brace tag=Tag_start (Doc_ws? inline_tag_component+ Doc_ws?)*? Close_brace
   ;
 
 description_component

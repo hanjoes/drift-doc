@@ -2,18 +2,16 @@ import Antlr4
 
 class Support {
     public static func isNotInlineTagStart(_ input: TokenStream) -> Bool {
-        let maybeNextToken = try! input.LT(1)
-        
-        guard let nextToken = maybeNextToken else {
-            return true
-        }
-        guard (nextToken.getText())! == "{" else {
-            return true
-        }
-        guard let afterNextToken = try! input.LT(2) else {
-            return true
+        if let nextToken = try! input.LT(1) {
+            if (nextToken.getText())! == "{" {
+                if let afterNextToken = try! input.LT(2) {
+                    if let tagStr = afterNextToken.getText() {
+                        return !tagStr.starts(with: "@")
+                    }
+                }
+            }
         }
         
-        return (afterNextToken.getText())! != "@"
+        return true
     }
 }

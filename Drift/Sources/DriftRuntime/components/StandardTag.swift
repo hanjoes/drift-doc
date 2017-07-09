@@ -1,6 +1,10 @@
 import Foundation
 
-public struct StandardTag: ParentComponent {
-    public var tagName: String
-    public var children: [DocComponent]
+struct StandardTag: TagComponent {
+    var name: String
+    var children = [DocComponent]()
+    
+    init(tagName: String) {
+        self.name = tagName
+    }
 }

@@ -1,5 +1,10 @@
 import Foundation
 
-public struct InlineTag: ParentComponent {
-    var children: [DocComponent]
+public struct InlineTag: TagComponent {
+    var name: String
+    var children = [DocComponent]()
+    
+    init(tagName: String) {
+        self.name = tagName
+    }
 }
