@@ -22,7 +22,7 @@ code : Printable+;
 // It is possible to have a comment with only tags and no description.  
 // The description cannot  continue after  the  tag  section begins.
 javadoc
-  : Doc_start description_components Doc_ws* tag_section Doc_end
+  : Doc_start description_components tag_section Doc_end
   ;
 
 // Standard and in-line tags - A tag is a special keyword within a doc comment
@@ -66,11 +66,11 @@ standard_tag
 // Comments are written in HTML - The text must be written in HTML, in that they
 // should use HTML entities  and  HTML  tags.
 description_components
-  : (Doc_ws? description_component+ Doc_ws?)*
+  : description_component*
   ;
 
 inline_tag
-  : Open_brace tag=Tag_start (Doc_ws? inline_tag_component+ Doc_ws?)*? Close_brace
+  : Open_brace tag=Tag_start inline_tag_component*? Close_brace
   ;
 
 description_component
@@ -81,6 +81,7 @@ description_component
   | Html_open                                         # HTMLOpen
   | Html_close                                        # HTMLClose
   | Doc_text                                          # DocText
+  | Doc_ws                                            # DocWS
   ;
 
 inline_tag_component
@@ -90,11 +91,17 @@ inline_tag_component
   | Html_open                                         # InlineTagHTMLOpen
   | Html_close                                        # InlineTagHTMLClose
   | Doc_text                                          # InlineTagDocText
+  | Doc_ws                                            # InlineTagDocWS
   ;
 
 // Fuzzy match of HTML elements.
 // Some of the element names are too general (like a), and seem to
 // mess up the grammar.
 html_element
-  : Html_open Doc_ws* Doc_text Doc_ws* Html_close
+  : Html_open html_content+? Html_close
+  ;
+
+html_content
+  : Doc_ws
+  | Doc_text
   ;
