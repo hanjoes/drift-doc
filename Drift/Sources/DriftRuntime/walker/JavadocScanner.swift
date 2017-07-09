@@ -35,4 +35,62 @@ class JavadocScanner: JavadocParserBaseListener {
         }
     }
     
+    override func enterOpenBrace(_ ctx: JavadocParser.OpenBraceContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterCloseBrace(_ ctx: JavadocParser.CloseBraceContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterHTMLOpen(_ ctx: JavadocParser.HTMLOpenContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterHTMLClose(_ ctx: JavadocParser.HTMLCloseContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterDocText(_ ctx: JavadocParser.DocTextContext) {
+        process(text: ctx.getText())
+    }
+
+    
+    override func enterInlineTagOpenBrace(_ ctx: JavadocParser.InlineTagOpenBraceContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterInlineTagCloseBrace(_ ctx: JavadocParser.InlineTagCloseBraceContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterInlineTagHTMLOpen(_ ctx: JavadocParser.InlineTagHTMLOpenContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterInlineTagHTMLClose(_ ctx: JavadocParser.InlineTagHTMLCloseContext) {
+        process(text: ctx.getText())
+    }
+    
+    override func enterInlineTagDocText(_ ctx: JavadocParser.InlineTagDocTextContext) {
+        process(text: ctx.getText())
+    }
+}
+
+// MARK: - Helper Methods
+private extension JavadocScanner {
+    func process(text: String) {
+        if let lastComponent = currentParent.children.last {
+            let textComponent = TextComponent(data: text)
+            if let lastTextComponent = lastComponent as? TextComponent {
+                currentParent.children[currentParent.children.count-1] = lastTextComponent.merged(with: textComponent)
+                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
+            }
+            else {
+                currentParent.children.append(textComponent)
+                print("Text: \(textComponent)")
+            }
+        }
+//        print("on text component: \(text)")
+    }
 }

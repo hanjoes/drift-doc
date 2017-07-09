@@ -89,7 +89,7 @@ inline_tag_component
   | Close_brace                                       # InlineTagCloseBrace
   | Html_open                                         # InlineTagHTMLOpen
   | Html_close                                        # InlineTagHTMLClose
-  | Doc_text                                          # InlineTagHTMLDocText
+  | Doc_text                                          # InlineTagDocText
   ;
 
 // Fuzzy match of HTML elements.

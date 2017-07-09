@@ -1,4 +1,4 @@
 import Foundation
 
-public protocol DocComponent {
+public protocol DocComponent: CustomStringConvertible {
 }
