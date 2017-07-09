@@ -54,7 +54,6 @@ class JavadocScanner: JavadocParserBaseListener {
     override func enterDocText(_ ctx: JavadocParser.DocTextContext) {
         process(text: ctx.getText())
     }
-
     
     override func enterInlineTagOpenBrace(_ ctx: JavadocParser.InlineTagOpenBraceContext) {
         process(text: ctx.getText())
@@ -81,16 +80,15 @@ class JavadocScanner: JavadocParserBaseListener {
 private extension JavadocScanner {
     func process(text: String) {
         if let lastComponent = currentParent.children.last {
-            let textComponent = TextComponent(data: text)
-            if let lastTextComponent = lastComponent as? TextComponent {
+            let textComponent = Text(data: text)
+            if let lastTextComponent = lastComponent as? Text {
                 currentParent.children[currentParent.children.count-1] = lastTextComponent.merged(with: textComponent)
-                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
+//                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
             }
             else {
                 currentParent.children.append(textComponent)
-                print("Text: \(textComponent)")
+//                print("Text: \(textComponent)")
             }
         }
-//        print("on text component: \(text)")
     }
 }
