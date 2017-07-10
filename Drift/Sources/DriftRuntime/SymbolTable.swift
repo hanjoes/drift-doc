@@ -7,6 +7,6 @@
 
 import Foundation
 
-public struct SymbolTable {
-    public let docRoot: DocComponent
+struct SymbolTable {
+    let docRoot: DocComponent
 }

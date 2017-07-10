@@ -4,8 +4,10 @@ class JavadocScanner: JavadocParserBaseListener {
     
     var currentParent: ParentComponent! = nil
     
+    var root = Javadoc()
+    
     override func enterJavadoc(_ ctx: JavadocParser.JavadocContext) {
-        currentParent = Javadoc()
+        currentParent = root
     }
     
     override func enterHtml_element(_ ctx: JavadocParser.Html_elementContext) {
@@ -91,11 +93,11 @@ private extension JavadocScanner {
             let textComponent = Text(data: text)
             if let lastTextComponent = lastComponent as? Text {
                 currentParent.children[currentParent.children.count-1] = lastTextComponent.merged(with: textComponent)
-                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
+//                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
             }
             else {
                 currentParent.children.append(textComponent)
-                print("Text: \(textComponent)")
+//                print("Text: \(textComponent)")
             }
         }
     }
