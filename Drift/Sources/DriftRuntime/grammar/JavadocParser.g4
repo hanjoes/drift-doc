@@ -74,7 +74,7 @@ inline_tag
   ;
 
 description_component
-  : html_element                                      # HTML
+  : {Support.isHTMLElement(_input)}? html_element     # HTML
   | {Support.isNotInlineTagStart(_input)}? Open_brace # OpenBrace
   | inline_tag                                        # InlineTag
   | Close_brace                                       # CloseBrace
@@ -85,7 +85,7 @@ description_component
   ;
 
 inline_tag_component
-  : html_element                                      # InlineTagHTML
+  : {Support.isHTMLElement(_input)}? html_element     # InlineTagHTML
   | Open_brace                                        # InlineTagOpenBrace
   | Close_brace                                       # InlineTagCloseBrace
   | Html_open                                         # InlineTagHTMLOpen

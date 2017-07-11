@@ -2,19 +2,24 @@ import Antlr4
 
 class JavadocScanner: JavadocParserBaseListener {
     
-    var currentParent: ParentComponent! = nil
+    var enclosingComponent: ParentComponent! = nil
     
-    var root = Javadoc()
+    var root: Javadoc!
     
     override func enterJavadoc(_ ctx: JavadocParser.JavadocContext) {
-        currentParent = root
+        enclosingComponent = Javadoc()
+    }
+    
+    override func exitJavadoc(_ ctx: JavadocParser.JavadocContext) {
+        root = enclosingComponent as! Javadoc
     }
     
     override func enterHtml_element(_ ctx: JavadocParser.Html_elementContext) {
         let contents = ctx.html_content()
         let contentText = contents.map { $0.getText() }
-        let htmlElement = HTMLElement(content: contentText.joined(separator: ""))
-        currentParent.children.append(htmlElement)
+        var htmlElement = HTMLElement(content: contentText.joined(separator: ""))
+        htmlElement.parentComponent = enclosingComponent
+        enclosingComponent.children.append(htmlElement)
     }
     
     override func enterInline_tag(_ ctx: JavadocParser.Inline_tagContext) {
@@ -22,9 +27,17 @@ class JavadocScanner: JavadocParserBaseListener {
             let nameStart = tagStr.index(tagStr.startIndex, offsetBy: 1)
             let tagName = String(tagStr.suffix(from: nameStart))
 //            print("inlineTagName: \(tagName)")
-            let inlineTag = InlineTag(tagName: tagName)
-            currentParent.children.append(inlineTag)
+            var inlineTag = InlineTag(tagName: tagName)
+            inlineTag.parentComponent = enclosingComponent
+            enclosingComponent.children.append(inlineTag)
+            enclosingComponent = inlineTag
         }
+    }
+    
+    override func exitInline_tag(_ ctx: JavadocParser.Inline_tagContext) {
+        let inlineTag = enclosingComponent as! InlineTag
+        enclosingComponent = enclosingComponent.parentComponent
+        enclosingComponent.children.append(inlineTag)
     }
     
     override func enterStandard_tag(_ ctx: JavadocParser.Standard_tagContext) {
@@ -32,9 +45,17 @@ class JavadocScanner: JavadocParserBaseListener {
             let nameStart = tagStr.index(tagStr.startIndex, offsetBy: 1)
             let tagName = String(tagStr.suffix(from: nameStart))
 //            print("standardTagName: \(tagName)")
-            let standardTag = StandardTag(tagName: tagName)
-            currentParent.children.append(standardTag)
+            var standardTag = StandardTag(tagName: tagName)
+            standardTag.parentComponent = enclosingComponent
+            enclosingComponent.children.append(standardTag)
+            enclosingComponent = standardTag
         }
+    }
+    
+    override func exitStandard_tag(_ ctx: JavadocParser.Standard_tagContext) {
+        let standardTag = enclosingComponent as! StandardTag
+        enclosingComponent = enclosingComponent.parentComponent
+        enclosingComponent.children.append(standardTag)
     }
     
     override func enterOpenBrace(_ ctx: JavadocParser.OpenBraceContext) {
@@ -89,16 +110,15 @@ class JavadocScanner: JavadocParserBaseListener {
 // MARK: - Helper Methods
 private extension JavadocScanner {
     func process(text: String) {
-        if let lastComponent = currentParent.children.last {
-            let textComponent = Text(data: text)
+        let textComponent = Text(data: text)
+        if let lastComponent = enclosingComponent.children.last {
             if let lastTextComponent = lastComponent as? Text {
-                currentParent.children[currentParent.children.count-1] = lastTextComponent.merged(with: textComponent)
-//                print("Merged text: \(currentParent.children[currentParent.children.count-1])")
-            }
-            else {
-                currentParent.children.append(textComponent)
-//                print("Text: \(textComponent)")
+                enclosingComponent.children[enclosingComponent.children.count-1] = lastTextComponent.merged(with: textComponent)
+                print("Merged text: \(enclosingComponent.children[enclosingComponent.children.count-1])")
+                return
             }
         }
+        enclosingComponent.children.append(textComponent)
+        print("Text: \(textComponent)")
     }
 }

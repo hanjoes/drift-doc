@@ -6,7 +6,7 @@ class TestComponents: XCTestCase {
     
     func testScannedComponents() throws {
         let expected = """
-        /**|:
+        |:|:
          * Sample file.
          * :||:p:||:some text:||:p:||:
          *
@@ -30,7 +30,7 @@ class TestComponents: XCTestCase {
          * :||:pre:||:
          *
          * a should be < 2 but > 3
-         :|:|*/
+         :|:|:|
         """
         checkDocComponents(expecting: expected, input: MockTest.file)
     }

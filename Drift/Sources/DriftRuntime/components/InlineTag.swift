@@ -5,8 +5,10 @@ struct InlineTag: TagComponent {
     
     var children = [DocComponent]()
     
+    var parentComponent: ParentComponent?
+    
     var description: String {
-        return "|:{@\(name)\(children.map{$0.description}.joined(separator: "")):|"
+        return "|:{@\(name)\(children.map{$0.description}.joined(separator: ""))}:|"
     }
     
     init(tagName: String) {

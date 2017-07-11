@@ -5,6 +5,8 @@ struct StandardTag: TagComponent {
     
     var children = [DocComponent]()
     
+    var parentComponent: ParentComponent?
+    
     var description: String {
         return "|:@\(name)\(children.map{$0.description}.joined(separator: "")):|"
     }
