@@ -14,20 +14,20 @@ class Support {
                            "tfoot", "th", "thead", "time", "title", "tr", "track", "u", "ul", "var", "video", "wbr"]
                            
 
-    public static func isNotInlineTagStart(_ input: TokenStream) -> Bool {
+    public static func isInlineTag(_ input: TokenStream) -> Bool {
         guard let nextTokenText = Support.getLookAheadText(at: 1, in: input) else {
-            return true
+            return false
         }
         
         if nextTokenText == "{" {
             guard let afterNextTokenText = Support.getLookAheadText(at: 2, in: input) else {
-                return true
+                return false
             }
             
-            return !afterNextTokenText.starts(with: "@")
+            return afterNextTokenText.starts(with: "@")
         }
         
-        return true
+        return false
     }
     
     public static func isHTMLElement(_ input: TokenStream) -> Bool {
