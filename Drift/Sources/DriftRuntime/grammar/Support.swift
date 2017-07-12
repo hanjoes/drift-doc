@@ -15,15 +15,18 @@ class Support {
                            
 
     public static func isNotInlineTagStart(_ input: TokenStream) -> Bool {
-        if let nextToken = try! input.LT(1) {
-            if (nextToken.getText())! == "{" {
-                if let afterNextToken = try! input.LT(2) {
-                    if let tagStr = afterNextToken.getText() {
-                        return !tagStr.starts(with: "@")
-                    }
-                }
-            }
+        guard let nextTokenText = Support.getLookAheadText(at: 1, in: input) else {
+            return true
         }
+        
+        if nextTokenText == "{" {
+            guard let afterNextTokenText = Support.getLookAheadText(at: 2, in: input) else {
+                return true
+            }
+            
+            return !afterNextTokenText.starts(with: "@")
+        }
+        
         return true
     }
     
