@@ -8,7 +8,7 @@
 import Foundation
 
 struct MockTest {
-    static let file =
+    static let sample1 =
 """
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
@@ -92,4 +92,46 @@ public class Support {
     }
 }
 """
+    static let sample2 =
+"""
+open func getErrorHeader(_ e: AnyObject) -> String {
+    let line: Int = (e as! RecognitionException).getOffendingToken().getLine()
+    let charPositionInLine: Int = (e as! RecognitionException).getOffendingToken().getCharPositionInLine()
+    return "line " + String(line) + ":" + String(charPositionInLine)
+}
+/** How should a token be displayed in an error message? The default
+ *  is to display just the text, but during development you might
+ *  want to have a lot of information spit out.  Override in that case
+ *  to use t.toString() (which, for CommonToken, dumps everything about
+ *  the token). This is better than forcing you to override a method in
+ *  your token objects because you don't have to go modify your lexer
+ *  so that it creates a new Java type.
+ *
+ * @deprecated This method is not called by the ANTLR 4 Runtime. Specific
+ * implementations of {@link org.antlr.v4.runtime.ANTLRErrorStrategy} may provide a similar
+ * feature when necessary. For example, see
+ * {@link org.antlr.v4.runtime.DefaultErrorStrategy#getTokenErrorDisplay}.
+ */
+open func getTokenErrorDisplay(_ t: Token?) -> String {
+    guard let t = t else {
+        return "<no token>"
+    }
+    var s: String
+    
+    if let text = t.getText() {
+        s = text
+    } else {
+        if t.getType() == CommonToken.EOF {
+            s = "<EOF>"
+        } else {
+            s = "<\\(t.getType())>"
+        }
+    }
+    s = s.replacingOccurrences(of: "\n", with: "\\n")
+    s = s.replacingOccurrences(of: "\r", with: "\\r")
+    s = s.replacingOccurrences(of: "\t", with: "\\t")
+    return "\\(s)"
+}
+"""
+    
 }
