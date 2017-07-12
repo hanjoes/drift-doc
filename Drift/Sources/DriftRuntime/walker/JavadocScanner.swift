@@ -114,11 +114,11 @@ private extension JavadocScanner {
         if let lastComponent = enclosingComponent.children.last {
             if let lastTextComponent = lastComponent as? Text {
                 enclosingComponent.children[enclosingComponent.children.count-1] = lastTextComponent.merged(with: textComponent)
-                print("Merged text: \(enclosingComponent.children[enclosingComponent.children.count-1])")
+//                print("Merged text: \(enclosingComponent.children[enclosingComponent.children.count-1])")
                 return
             }
         }
         enclosingComponent.children.append(textComponent)
-        print("Text: \(textComponent)")
+//        print("Text: \(textComponent)")
     }
 }
