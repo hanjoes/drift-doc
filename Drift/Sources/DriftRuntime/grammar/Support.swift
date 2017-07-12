@@ -54,10 +54,6 @@ private extension Support {
             return nil
         }
         
-        guard let lookAheadTextAttempt = try? lookAheadToken.getText() else {
-            return nil
-        }
-        
-        return lookAheadTextAttempt
+        return lookAheadToken.getText()
     }
 }
