@@ -133,5 +133,12 @@ open func getTokenErrorDisplay(_ t: Token?) -> String {
     return "\\(s)"
 }
 """
-    
+    static let sample3 =
+"""
+/** Creates the CORS middleware from the values contained in the settings config json file.
+
+     - Parameter configuration: The settings configuration.
+     - Throws: Exception if the `CORSConfiugration` couldn't be parsed out of `Configs.Config`.
+ */
+"""
 }

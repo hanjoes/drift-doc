@@ -3,8 +3,10 @@ import Antlr4
 @testable import DriftRuntime
 
 class TestComponents: XCTestCase {
-    
-    func testScanningSample1() throws {
+    ///
+    /// A relatively comprehensive test sample with Javadoc.
+    ///
+    func testScanningSample1() {
         let expected = """
         |:|:
          * Sample file.
@@ -35,7 +37,10 @@ class TestComponents: XCTestCase {
         checkDocComponents(expecting: expected, input: MockTest.sample1)
     }
     
-    func testScanningSample2() throws {
+    ///
+    /// Yet another test sample with Javadoc in it.
+    ///
+    func testScanningSample2() {
         let expected = """
         |:|: How should a token be displayed in an error message? The default
          *  is to display just the text, but during development you might
@@ -52,6 +57,18 @@ class TestComponents: XCTestCase {
          :|:|:|
         """
         checkDocComponents(expecting: expected, input: MockTest.sample2)
+    }
+    
+    /// Test sample that's not containing any Javadoc in comment.
+    func testScanningSample3() {
+        let expected = """
+        |:|: Creates the CORS middleware from the values contained in the settings config json file.
+
+             - Parameter configuration: The settings configuration.
+             - Throws: Exception if the `CORSConfiugration` couldn't be parsed out of `Configs.Config`.
+         :|:|
+        """
+        checkDocComponents(expecting: expected, input: MockTest.sample3)
     }
     
     func checkDocComponents(expecting expected: String, input: String) {
