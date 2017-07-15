@@ -34,7 +34,7 @@ class TestComponents: XCTestCase {
          * a should be < 2 but > 3
          :|:|:|
         """
-        checkDocComponents(expecting: expected, input: MockTest.sample1)
+        checkDocComponents(expecting: expected, input: Resources.sample1)
     }
     
     ///
@@ -56,7 +56,7 @@ class TestComponents: XCTestCase {
          * :||:{@link|: org.antlr.v4.runtime.DefaultErrorStrategy#getTokenErrorDisplay:|}:||:.
          :|:|:|
         """
-        checkDocComponents(expecting: expected, input: MockTest.sample2)
+        checkDocComponents(expecting: expected, input: Resources.sample2)
     }
     
     /// Test sample that's not containing any Javadoc in comment.
@@ -68,7 +68,7 @@ class TestComponents: XCTestCase {
              - Throws: Exception if the `CORSConfiugration` couldn't be parsed out of `Configs.Config`.
          :|:|
         """
-        checkDocComponents(expecting: expected, input: MockTest.sample3)
+        checkDocComponents(expecting: expected, input: Resources.sample3)
     }
     
     func checkDocComponents(expecting expected: String, input: String) {
