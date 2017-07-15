@@ -8,7 +8,7 @@
 import XCTest
 @testable import DriftRuntime
 
-class TestWarmup: XCTestCase {
+class TestPreprocess: XCTestCase {
     func testParseFileContainsTripleSlashComments() {
         let file = """
 
@@ -21,6 +21,8 @@ class TestWarmup: XCTestCase {
         }
         """
         let fileComments = Preprocess.parse(file: file)
-        print(fileComments.comments)
+        XCTAssertEqual([file.index(file.startIndex, offsetBy: 1)], fileComments.comments[0])
+        XCTAssertEqual([file.index(file.startIndex, offsetBy: 49),
+                        file.index(file.startIndex, offsetBy: 70)], fileComments.comments[1])
     }
 }

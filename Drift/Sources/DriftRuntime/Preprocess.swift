@@ -23,7 +23,7 @@ struct Preprocess {
     ///
     /// - Parameter content: content of the file
     /// - Returns: converted string
-    static func convertComment(forFile content: String) -> String {
+    static func convertComment(inFile content: String) -> String {
         guard content.count >= 3 else {
             return content
         }
@@ -35,22 +35,61 @@ struct Preprocess {
         return ""
     }
 
+    /// Parse the file and return data about comment blocks.
+    ///
+    /// - Parameter content: the content to parse
+    /// - Returns: CommentData struct regarding the comments
     static func parse(file content: String) -> CommentData {
-        let lines = content.components(separatedBy: "\n")
-        var indexes = [[String.Index]]()
-        var previousIsComment = false
-        var commentBlock = [String.Index]()
-        for line in lines {
-            if let tripleSlashRange = line.range(of: Preprocess.TripleSlash) {
-                previousIsComment = true
-                commentBlock.append(tripleSlashRange.lowerBound)
+        var commentIndexes = [[String.Index]]()
+        var index = content.startIndex
+        var comments = [String.Index]()
+        while index < content.endIndex {
+            if index == content.startIndex || content[index] == "\n" {
+                index = consumeWS(in: content, at: index)
             }
-            else if previousIsComment {
-                previousIsComment = false
-                indexes.append(commentBlock)
-                commentBlock = [String.Index]()
+            
+            if matchTripleSlashComment(in: content, at: index) {
+                comments.append(index)
             }
+            else {
+                commentIndexes.append(comments)
+                comments = [String.Index]()
+            }
+            
+            index = consumeLine(in: content, from: index)
+            
         }
-        return CommentData(file: content, comments: indexes)
+        return CommentData(file: content, comments: commentIndexes)
+    }
+    
+    
+}
+
+private extension Preprocess {
+    static func consumeLine(in content: String, from index: String.Index) -> String.Index {
+        var currentIndex = index
+//        print("currentIndex: \(currentIndex)")
+//        print("content: \(content[currentIndex])")
+        while currentIndex != content.endIndex && content[currentIndex] != "\n" {
+            currentIndex = content.index(after: currentIndex)
+        }
+//        print("after currentIndex: \(currentIndex)")
+        return currentIndex
+    }
+    
+    static func consumeWS(in line: String, at index: String.Index) -> String.Index {
+        var currentIndex = index
+        while currentIndex != line.endIndex && isWS(line[currentIndex]) {
+            currentIndex = line.index(after: currentIndex)
+        }
+        return currentIndex
+    }
+    
+    static func matchTripleSlashComment(in line: String, at index: String.Index) -> Bool {
+        return line[index...].starts(with: Preprocess.TripleSlash)
+    }
+    
+    static func isWS(_ chr: Character) -> Bool {
+        return chr == "\t" || chr == " " || chr == "\n"
     }
 }
