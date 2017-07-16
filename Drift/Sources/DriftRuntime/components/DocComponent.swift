@@ -1,5 +1,5 @@
 import Foundation
 
-protocol DocComponent: CustomStringConvertible {
+protocol DocComponent: CustomStringConvertible, SwiftMarkupConvertible {
     var parentComponent: ParentComponent? { get set }
 }

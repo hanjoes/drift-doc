@@ -1,5 +1,5 @@
 import Foundation
 
-protocol NamedComponent {
+protocol Named {
     var name: String { get }
 }

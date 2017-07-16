@@ -1,12 +1,6 @@
-//
-//  MockTestFile.swift
-//  DriftRuntimeTests
-//
-//  Created by Hanzhou Shi on 7/6/17.
-//
-
 import Foundation
 
+/// Test Resources.
 struct Resources {
     static let sample1 =
 """
@@ -305,5 +299,16 @@ open class ATNSimulator {
 
 }
 
+"""
+    
+    static let sample5 =
+"""
+/**
+ *  Noop.
+ *
+ *  @author hanjoes
+ */
+public static func noop() {
+}
 """
 }

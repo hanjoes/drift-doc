@@ -5,11 +5,21 @@ struct HTMLElement: DocComponent {
     
     var parentComponent: ParentComponent?
     
+    init(content: String) {
+        self.content = content
+    }
+}
+
+// MARK: CustomStringConvertible
+extension HTMLElement {
     var description: String {
         return "|:\(content):|"
     }
-    
-    init(content: String) {
-        self.content = content
+}
+
+// MARK: SwiftMarkupConvertible
+extension HTMLElement {
+    var markup: String {
+        return ""
     }
 }
