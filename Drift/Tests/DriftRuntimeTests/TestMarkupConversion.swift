@@ -26,4 +26,18 @@ class TestMarkupConversion: XCTestCase {
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
     }
+    
+    func testMarkupConversionParameter() {
+        let file = Resources.sample6
+        let expected =
+"""
+
+ *  Noop.
+ *
+ *  - Parameter: param some parameter.
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
 }

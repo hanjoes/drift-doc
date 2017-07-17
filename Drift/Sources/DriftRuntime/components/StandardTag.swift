@@ -43,13 +43,12 @@ extension StandardTag {
         switch name {
         case "author":
             swiftMarkup = Author(authorName: childrenMarkup)
-            break
 //        case "deprecated":
 //            break
 //        case "exception":
 //            break
-//        case "param":
-//            break
+        case "param":
+            swiftMarkup = Parameter(content: childrenMarkup)
 //        case "return":
 //            break
 //        case "see":
