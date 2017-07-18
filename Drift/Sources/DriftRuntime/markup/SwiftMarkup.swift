@@ -1,2 +1,0 @@
-protocol SwiftMarkup: CustomStringConvertible {
-}

@@ -321,4 +321,48 @@ public static func noop() {
 public static func noop(param: Int) {
 }
 """
+    
+    static let sample7 =
+"""
+/**
+ *  Noop.
+ *
+ *  @return returning nothing.
+ */
+public static func noop(param: Int) -> Void {
+}
+"""
+    
+    static let sample8 =
+"""
+/**
+ *  Noop.
+ *
+ *  @since first introduced in end of time.
+ */
+public static func noop(param: Int) -> Void {
+}
+"""
+    
+    static let sample9 =
+    """
+/**
+ *  Noop.
+ *
+ *  @throws some exception
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+    
+    static let sample10 =
+"""
+/**
+ *  Noop.
+ *
+ *  @version version 3.1415926
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
 }

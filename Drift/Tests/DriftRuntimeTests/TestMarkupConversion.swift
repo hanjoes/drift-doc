@@ -1,10 +1,3 @@
-//
-//  TestMarkupConversion.swift
-//  DriftRuntime
-//
-//  Created by Hanzhou Shi on 7/16/17.
-//
-
 import XCTest
 @testable import DriftRuntime
 
@@ -35,6 +28,62 @@ class TestMarkupConversion: XCTestCase {
  *  Noop.
  *
  *  - Parameter: param some parameter.
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMarkupConversionReturns() {
+        let file = Resources.sample7
+        let expected =
+"""
+
+ *  Noop.
+ *
+ *  - Returns: returning nothing.
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMarkupConversionSince() {
+        let file = Resources.sample8
+        let expected =
+"""
+
+ *  Noop.
+ *
+ *  - Since: first introduced in end of time.
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMarkupConversionThrows() {
+        let file = Resources.sample9
+        let expected =
+"""
+
+ *  Noop.
+ *
+ *  - Throws: some exception
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMarkupConversionVersion() {
+        let file = Resources.sample10
+        let expected =
+"""
+
+ *  Noop.
+ *
+ *  - Version: version 3.1415926
  
 """
         let actual = converter.emitSwiftComments(for: file)

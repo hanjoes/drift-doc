@@ -34,7 +34,7 @@ extension InlineTag {
     /// +--------------+-------------+
     ///
     var markup: String {
-        var swiftMarkup: SwiftMarkup
+        var callout: Callout
         switch name {
 //        case "code":
 //            break
@@ -51,8 +51,8 @@ extension InlineTag {
 //        case "value":
 //            break
         default:
-            swiftMarkup = Noop(content: childrenMarkup)
+            callout = Noop(content: childrenMarkup)
         }
-        return "\(swiftMarkup)"
+        return "\(callout)"
     }
 }

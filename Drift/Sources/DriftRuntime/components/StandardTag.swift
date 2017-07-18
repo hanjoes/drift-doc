@@ -39,18 +39,18 @@ extension StandardTag {
     /// +--------------+-------------+
     ///
     var markup: String {
-        var swiftMarkup: SwiftMarkup
+        var callout: Callout
         switch name {
         case "author":
-            swiftMarkup = Author(authorName: childrenMarkup)
+            callout = Author(content: childrenMarkup)
 //        case "deprecated":
 //            break
 //        case "exception":
 //            break
         case "param":
-            swiftMarkup = Parameter(content: childrenMarkup)
-//        case "return":
-//            break
+            callout = Parameter(content: childrenMarkup)
+        case "return":
+            callout = Returns(content: childrenMarkup)
 //        case "see":
 //            break
 //        case "serial":
@@ -59,15 +59,15 @@ extension StandardTag {
 //            break
 //        case "serialField":
 //            break
-//        case "since":
-//            break
-//        case "throws":
-//            break
-//        case "version":
-//            break
+        case "since":
+            callout = Since(content: childrenMarkup)
+        case "throws":
+            callout = Throws(content: childrenMarkup)
+        case "version":
+            callout = Version(content: childrenMarkup)
         default:
-            swiftMarkup = Noop(content: childrenMarkup)
+            callout = Noop(content: childrenMarkup)
         }
-        return "\(swiftMarkup)"
+        return "\(callout)"
     }
 }

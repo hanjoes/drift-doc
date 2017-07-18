@@ -1,5 +1,5 @@
 import Foundation
 
-struct Noop: Callout {
+struct Throws: Callout {
     var content: String
 }
