@@ -9,7 +9,7 @@ struct Text: MergingComponent {
         self.data = data
     }
     
-    func merged<T>(with component: T) -> Text where T : MergingComponent, Text.DataType == T.DataType {
+    func merged<T: MergingComponent>(with component: T) -> Text where Text.DataType == T.DataType {
         return Text(data: data + component.data)
     }
 }
@@ -21,9 +21,9 @@ extension Text {
     }
 }
 
-// MARK: SwiftMarkupConvertible
 extension Text {
-    var markup: String {
-        return data
+    var markup: SwiftMarkupOutputModel {
+        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
     }
 }
+

@@ -19,23 +19,29 @@ extension InlineTag {
     }
 }
 
-// MARK: SwiftMarkupConvertible
 extension InlineTag {
-    /// Available Javadoc tags.
-    ///
-    /// +--------------+-------------+
-    /// |{@code}       | 1.5         |
-    /// |{@docRoot}    | 1.3         |
-    /// |{@inheritDoc} | 1.4         |
-    /// |{@link}       | 1.2         |
-    /// |{@linkplain}  | 1.4         |
-    /// |{@literal}    | 1.5         |
-    /// |{@value}      | 1.4         |
-    /// +--------------+-------------+
-    ///
-    var markup: String {
-        var callout: Callout
-        switch name {
+    var markup: SwiftMarkupOutputModel {
+        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
+    }
+}
+//
+//// MARK: SwiftMarkupConvertible
+//extension InlineTag {
+//    /// Available Javadoc tags.
+//    ///
+//    /// +--------------+-------------+
+//    /// |{@code}       | 1.5         |
+//    /// |{@docRoot}    | 1.3         |
+//    /// |{@inheritDoc} | 1.4         |
+//    /// |{@link}       | 1.2         |
+//    /// |{@linkplain}  | 1.4         |
+//    /// |{@literal}    | 1.5         |
+//    /// |{@value}      | 1.4         |
+//    /// +--------------+-------------+
+//    ///
+//    func injected(to markup: SwiftMarkupOutput) -> SwiftMarkupOutput {
+//        var callout: Callout
+//        switch name {
 //        case "code":
 //            break
 //        case "docRoot":
@@ -50,9 +56,10 @@ extension InlineTag {
 //            break
 //        case "value":
 //            break
-        default:
-            callout = Noop(content: childrenMarkup)
-        }
-        return "\(callout)"
-    }
-}
+//        default:
+//            break
+//        }
+//        return markup
+//    }
+//}
+

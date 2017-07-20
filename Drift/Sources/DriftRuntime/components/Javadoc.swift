@@ -8,10 +8,3 @@ struct Javadoc: ParentComponent {
     
 }
 
-// MARK: SwiftMarkupConvertible
-extension Javadoc {
-    var markup: String {
-        return childrenMarkup
-    }
-}
-

@@ -1,6 +1,7 @@
 import Foundation
 
 struct HTMLElement: DocComponent {
+    
     var content: String
     
     var parentComponent: ParentComponent?
@@ -19,7 +20,7 @@ extension HTMLElement {
 
 // MARK: SwiftMarkupConvertible
 extension HTMLElement {
-    var markup: String {
-        return ""
+    var markup: SwiftMarkupOutputModel {
+        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
     }
 }

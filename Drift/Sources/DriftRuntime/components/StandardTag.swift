@@ -19,8 +19,16 @@ extension StandardTag {
     }
 }
 
-// MARK: SwiftMarkupConvertible
+
 extension StandardTag {
+    var markup: SwiftMarkupOutputModel {
+        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
+    }
+}
+
+
+// MARK: SwiftMarkupConvertible
+//extension StandardTag {
     /// Available Javadoc tags.
     ///
     /// +--------------+-------------+
@@ -38,19 +46,19 @@ extension StandardTag {
     /// |@version      | 1.0         |
     /// +--------------+-------------+
     ///
-    var markup: String {
-        var callout: Callout
-        switch name {
-        case "author":
-            callout = Author(content: childrenMarkup)
+//    var markup: String {
+//        var callout: Callout
+//        switch name {
+//        case "author":
+//            callout = Author(content: childrenMarkup)
 //        case "deprecated":
 //            break
 //        case "exception":
 //            break
-        case "param":
-            callout = Parameter(content: childrenMarkup)
-        case "return":
-            callout = Returns(content: childrenMarkup)
+//        case "param":
+//            callout = Parameter(content: childrenMarkup)
+//        case "return":
+//            callout = Returns(content: childrenMarkup)
 //        case "see":
 //            break
 //        case "serial":
@@ -59,15 +67,16 @@ extension StandardTag {
 //            break
 //        case "serialField":
 //            break
-        case "since":
-            callout = Since(content: childrenMarkup)
-        case "throws":
-            callout = Throws(content: childrenMarkup)
-        case "version":
-            callout = Version(content: childrenMarkup)
-        default:
-            callout = Noop(content: childrenMarkup)
-        }
-        return "\(callout)"
-    }
-}
+//        case "since":
+//            callout = Since(content: childrenMarkup)
+//        case "throws":
+//            callout = Throws(content: childrenMarkup)
+//        case "version":
+//            callout = Version(content: childrenMarkup)
+//        default:
+//            callout = Noop(content: childrenMarkup)
+//        }
+//        return "\(callout)"
+//    }
+//}
+
