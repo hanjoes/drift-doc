@@ -23,7 +23,7 @@ extension Text {
 
 extension Text {
     var markup: SwiftMarkupOutputModel {
-        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
+        return SwiftMarkupDescription.text(data)
     }
 }
 

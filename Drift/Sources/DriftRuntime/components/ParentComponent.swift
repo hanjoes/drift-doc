@@ -11,9 +11,3 @@ extension ParentComponent {
     }
 }
 
-extension ParentComponent {
-    var markup: SwiftMarkupOutputModel {
-        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
-    }
-}
-

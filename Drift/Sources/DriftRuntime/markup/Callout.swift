@@ -1,16 +1,10 @@
 import Foundation
 
-protocol Callout: CustomStringConvertible, Named {
+protocol Callout: Named {
     var content: String { get }
 }
 
-// MARK: CustomStringConvertible
-extension Callout {
-    var description: String {
-        return "- \(name):\(content)"
-    }
-}
-
+// MARK: Named
 extension Callout {
     var name: String {
         return String(describing: type(of: self))

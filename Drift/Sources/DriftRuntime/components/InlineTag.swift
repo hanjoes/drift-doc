@@ -21,7 +21,7 @@ extension InlineTag {
 
 extension InlineTag {
     var markup: SwiftMarkupOutputModel {
-        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
+        return SwiftMarkupDescription.text(children.map{$0.description}.joined(separator: ""))
     }
 }
 //

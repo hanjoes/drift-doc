@@ -22,7 +22,38 @@ extension StandardTag {
 
 extension StandardTag {
     var markup: SwiftMarkupOutputModel {
-        return Noop(content: "", children: [SwiftMarkupOutputModel](), parent: nil)
+        var callout = Noop(content: children.map{$0.description}.joined(separator: ""))
+    //        var callout: Callout
+    //        switch name {
+    //        case "author":
+    //            callout = Author(content: childrenMarkup)
+    //        case "deprecated":
+    //            break
+    //        case "exception":
+    //            break
+    //        case "param":
+    //            callout = Parameter(content: childrenMarkup)
+    //        case "return":
+    //            callout = Returns(content: childrenMarkup)
+    //        case "see":
+    //            break
+    //        case "serial":
+    //            break
+    //        case "serialData":
+    //            break
+    //        case "serialField":
+    //            break
+    //        case "since":
+    //            callout = Since(content: childrenMarkup)
+    //        case "throws":
+    //            callout = Throws(content: childrenMarkup)
+    //        case "version":
+    //            callout = Version(content: childrenMarkup)
+    //        default:
+    //            callout = Noop(content: childrenMarkup)
+    //        }
+    //        return "\(callout)"
+        return callout
     }
 }
 
