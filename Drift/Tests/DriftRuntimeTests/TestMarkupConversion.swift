@@ -43,19 +43,28 @@ public static func noop(param: Int) {
         XCTAssertEqual(expected, actual)
     }
     
-//    func testMarkupConversionReturns() {
-//        let file = Resources.sample7
-//        let expected =
-//"""
-//
-// *  Noop.
-// *
-// *  - Returns: returning nothing.
-//
-//"""
-//        let actual = converter.emitSwiftComments(for: file)
-//        XCTAssertEqual(expected, actual)
-//    }
+    func testMarkupConversionReturns() {
+        let file =
+"""
+/**
+ *  Noop.
+ *
+ *  @return returning nothing.
+ */
+public static func noop(param: Int) -> Void {
+}
+"""
+        let expected =
+"""
+
+  Noop.
+
+  - Returns: returning nothing.
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
 //
 //    func testMarkupConversionSince() {
 //        let file = Resources.sample8

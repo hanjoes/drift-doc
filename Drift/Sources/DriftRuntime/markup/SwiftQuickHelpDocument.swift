@@ -26,9 +26,11 @@ extension SwiftQuickHelpDocument {
         let descriptionSectionOutput = "\(descriptionSection.map { $0.description }.joined(separator: ""))"
         let parameterSectionOutput = "\(parameterSection.map { $0.description }.joined(separator: ""))"
         let throwsSectionOutput = "\(throwsSection.map { $0.description }.joined(separator: ""))"
-//        let returnsSectionOutput = "\(returnsSection.map { $0.description }.joined(separator: ""))"
-        
-        return "\(descriptionSectionOutput)\(parameterSectionOutput)\(throwsSectionOutput)"
+        var result = "\(descriptionSectionOutput)\(parameterSectionOutput)\(throwsSectionOutput)"
+        if let returnsSection = self.returnsSection {
+            result = result + "\(returnsSection.description)"
+        }
+        return result
     }
 }
 

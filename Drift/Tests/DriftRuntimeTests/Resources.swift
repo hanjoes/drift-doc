@@ -311,27 +311,7 @@ open class ATNSimulator {
 public static func noop() {
 }
 """
-    static let sample6 =
-"""
-/**
- *  Noop.
- *
- *  @param param some parameter.
- */
-public static func noop(param: Int) {
-}
-"""
-    
-    static let sample7 =
-"""
-/**
- *  Noop.
- *
- *  @return returning nothing.
- */
-public static func noop(param: Int) -> Void {
-}
-"""
+
     
     static let sample8 =
 """

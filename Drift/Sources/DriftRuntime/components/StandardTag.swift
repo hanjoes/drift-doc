@@ -30,8 +30,9 @@ extension StandardTag {
     var markup: SwiftMarkupOutputModel {
         switch name {
         case "param":
-            print("is parameter")
             return Parameter(childrenMarkups: children.map{$0.markup})
+        case "return":
+            return Returns(childrenMarkups: children.map{$0.markup})
         default:
             return SwiftMarkupDescription.text(children.map{$0.markup.description}.joined(separator: ""))
         }
