@@ -2,7 +2,7 @@ import Foundation
 
 enum SwiftMarkupDescription {
     case text(String)
-    case callout(InlineCallout)
+    case callout(Callout)
 }
 
 // MARK: SwiftMarkupOutputModel

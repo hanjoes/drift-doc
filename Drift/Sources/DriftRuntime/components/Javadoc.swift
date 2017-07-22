@@ -13,11 +13,12 @@ extension Javadoc: SwiftMarkupConvertible {
         // Traverse children and get markup.
         // TODO: What is the direct child of JAVADOC?
         _ = children.map {
-            if $0 is Parameter {
-                resultModel.parameterSection.append($0.markup)
+            let childMarkup = $0.markup
+            if childMarkup is Parameter {
+                resultModel.parameterSection.append(childMarkup)
             }
-            else if $0 is SwiftMarkupDescription {
-                resultModel.descriptionSection.append($0.markup)
+            else if childMarkup is SwiftMarkupDescription {
+                resultModel.descriptionSection.append(childMarkup)
             }
         }
         return resultModel

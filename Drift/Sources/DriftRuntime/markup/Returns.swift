@@ -1,5 +1,5 @@
 import Foundation
 
-struct Returns: Callout {
+struct Returns: DedicatedCallout {
     var childrenMarkups: [SwiftMarkupOutputModel]
 }

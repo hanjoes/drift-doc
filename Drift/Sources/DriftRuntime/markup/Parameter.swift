@@ -1,5 +1,6 @@
 import Foundation
 
-struct Parameter: Callout {
+struct Parameter: DedicatedCallout {
     var childrenMarkups: [SwiftMarkupOutputModel]
 }
+
