@@ -1,11 +1,11 @@
 import Foundation
 
 struct Noop: Callout, SwiftMarkupOutputModel {
-    var content: String
+    var childrenMarkups: [SwiftMarkupOutputModel]
 }
 
 extension Noop {
     var description: String {
-        return content
+        return ""
     }
 }

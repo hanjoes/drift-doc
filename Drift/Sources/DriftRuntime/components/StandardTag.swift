@@ -21,8 +21,20 @@ extension StandardTag {
 
 
 extension StandardTag {
+    var childrenMarkups: [SwiftMarkupOutputModel] {
+        return children.map {
+            $0.markup
+        }
+    }
+    
     var markup: SwiftMarkupOutputModel {
-        var callout = Noop(content: children.map{$0.description}.joined(separator: ""))
+        switch name {
+        case "param":
+            print("is parameter")
+            return Parameter(childrenMarkups: children.map{$0.markup})
+        default:
+            return Noop(childrenMarkups: [SwiftMarkupOutputModel]())
+        }
     //        var callout: Callout
     //        switch name {
     //        case "author":
@@ -53,7 +65,6 @@ extension StandardTag {
     //            callout = Noop(content: childrenMarkup)
     //        }
     //        return "\(callout)"
-        return callout
     }
 }
 

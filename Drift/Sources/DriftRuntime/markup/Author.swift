@@ -1,5 +1,5 @@
 import Foundation
 
 struct Author: Callout {
-    var content: String
+    var childrenMarkups: [SwiftMarkupOutputModel]
 }

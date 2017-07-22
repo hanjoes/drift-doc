@@ -25,7 +25,7 @@ extension DriftConverter {
             guard let _ = try? walker.walk(scanner, parser.file()) else {
                 return ""
             }
-            return ""
+            return scanner.root.markup.description
         }
         return ""
     }

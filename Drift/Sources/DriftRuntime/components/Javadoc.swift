@@ -9,9 +9,18 @@ struct Javadoc: ParentComponent {
 
 extension Javadoc: SwiftMarkupConvertible {
     var markup: SwiftMarkupOutputModel {
+        var resultModel = SwiftQuickHelpDocument()
         // Traverse children and get markup.
-        // Use the markup's injection method to inject into specific fields.
-        return SwiftQuickHelpDocument()
+        // TODO: What is the direct child of JAVADOC?
+        _ = children.map {
+            if $0 is Parameter {
+                resultModel.parameterSection.append($0.markup)
+            }
+            else if $0 is SwiftMarkupDescription {
+                resultModel.descriptionSection.append($0.markup)
+            }
+        }
+        return resultModel
     }
 }
 
