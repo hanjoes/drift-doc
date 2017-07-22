@@ -80,19 +80,28 @@ public static func noop(param: Int) -> Void {
 //        XCTAssertEqual(expected, actual)
 //    }
 //
-//    func testMarkupConversionThrows() {
-//        let file = Resources.sample9
-//        let expected =
-//"""
-//
-// *  Noop.
-// *
-// *  - Throws: some exception
-//
-//"""
-//        let actual = converter.emitSwiftComments(for: file)
-//        XCTAssertEqual(expected, actual)
-//    }
+    func testMarkupConversionThrows() {
+        let file =
+        """
+/**
+ *  Noop.
+ *
+ *  @throws some exception
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+"""
+
+  Noop.
+
+  - Throws: some exception
+ 
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
 //
 //    func testMarkupConversionVersion() {
 //        let file = Resources.sample10

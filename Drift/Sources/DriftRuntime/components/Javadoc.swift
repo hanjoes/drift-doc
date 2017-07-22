@@ -19,6 +19,9 @@ extension Javadoc: SwiftMarkupConvertible {
             else if childMarkup is Returns {
                 resultModel.returnsSection = childMarkup
             }
+            else if childMarkup is Throws {
+                resultModel.throwsSection.append(childMarkup)
+            }
             else if childMarkup is SwiftMarkupDescription {
                 resultModel.descriptionSection.append(childMarkup)
             }

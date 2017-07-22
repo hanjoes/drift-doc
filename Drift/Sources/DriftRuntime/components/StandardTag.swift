@@ -33,6 +33,8 @@ extension StandardTag {
             return Parameter(childrenMarkups: children.map{$0.markup})
         case "return":
             return Returns(childrenMarkups: children.map{$0.markup})
+        case "throws":
+            return Throws(childrenMarkups: children.map{$0.markup})
         default:
             return SwiftMarkupDescription.text(children.map{$0.markup.description}.joined(separator: ""))
         }
@@ -44,8 +46,6 @@ extension StandardTag {
     //            break
     //        case "exception":
     //            break
-    //        case "param":
-    //            callout = Parameter(content: childrenMarkup)
     //        case "return":
     //            callout = Returns(content: childrenMarkup)
     //        case "see":
@@ -58,8 +58,6 @@ extension StandardTag {
     //            break
     //        case "since":
     //            callout = Since(content: childrenMarkup)
-    //        case "throws":
-    //            callout = Throws(content: childrenMarkup)
     //        case "version":
     //            callout = Version(content: childrenMarkup)
     //        default:

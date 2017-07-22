@@ -324,17 +324,6 @@ public static func noop(param: Int) -> Void {
 }
 """
     
-    static let sample9 =
-    """
-/**
- *  Noop.
- *
- *  @throws some exception
- */
-public static func noop(param: Int) throws -> Void {
-}
-"""
-    
     static let sample10 =
 """
 /**
