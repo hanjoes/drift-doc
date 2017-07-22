@@ -7,6 +7,9 @@ struct Text: MergingComponent {
     
     init(data: String) {
         self.data = data
+        // pruning leading asterisks
+        // FIXME: how about multiply?
+        self.data = self.data.replacingOccurrences(of: "\n *", with: "\n")
     }
     
     func merged<T: MergingComponent>(with component: T) -> Text where Text.DataType == T.DataType {

@@ -33,9 +33,11 @@ public static func noop(param: Int) {
 """
         let expected =
 """
- Noop.
 
- - Parameter: param some parameter.
+  Noop.
+
+  - Parameter: param some parameter.
+ 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
