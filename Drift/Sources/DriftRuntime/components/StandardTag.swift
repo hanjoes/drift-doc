@@ -54,7 +54,8 @@ extension StandardTag {
         case "throws": fallthrough
         case "exception":
             return Throws(childrenMarkups: childrenMarkups)
-            
+        case "see":
+            return SeeAlso(childrenMarkups: childrenMarkups)
         case "author":
             return SwiftMarkupDescription.callout(Author(childrenMarkups: childrenMarkups))
         case "since":

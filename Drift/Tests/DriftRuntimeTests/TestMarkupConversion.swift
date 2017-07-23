@@ -160,6 +160,7 @@ Noop.
  *  @param param dorky parameter brother
  *  @since epoch
  *  @throws exception2
+ *  @see some other code
  */
 public static func noop(param: Int) throws -> Void {
 }
@@ -174,6 +175,7 @@ Comment line1.
 - Version: 3.14159
 - Author: hanjoes
 - Since: epoch
+- SeeAlso: some other code
 - Parameter param: dorky parameter
 - Parameter param: dorky parameter brother
 - Throws: some exception

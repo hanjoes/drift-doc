@@ -19,6 +19,7 @@ extension InlineTag {
     }
 }
 
+//// MARK: SwiftMarkupConvertible
 extension InlineTag {
     var childrenMarkups: [SwiftMarkupOutputModel] {
         return children.map {
@@ -26,7 +27,25 @@ extension InlineTag {
         }
     }
 
+
+    /// Available Javadoc inline tags.
+    /// only few of them are supported in this implementation.
+    /// +--------------+-------------+
+    /// |{@code}       | 1.5         |
+    /// |{@docRoot}    | 1.3         |
+    /// |{@inheritDoc} | 1.4         |
+    /// |{@link}       | 1.2         |
+    /// |{@linkplain}  | 1.4         |
+    /// |{@literal}    | 1.5         |
+    /// |{@value}      | 1.4         |
+    /// +--------------+-------------+
     var markup: SwiftMarkupOutputModel {
+//        case "link":
+//            break
+//        case "literal":
+//            break
+//        case "value":
+//            break
         switch name {
         case "code":
             return CodeVoice(childrenMarkups: childrenMarkups)
@@ -35,42 +54,4 @@ extension InlineTag {
         }
     }
 }
-//
-//// MARK: SwiftMarkupConvertible
-//extension InlineTag {
-//    /// Available Javadoc tags.
-//    ///
-//    /// +--------------+-------------+
-//    /// |{@code}       | 1.5         |
-//    /// |{@docRoot}    | 1.3         |
-//    /// |{@inheritDoc} | 1.4         |
-//    /// |{@link}       | 1.2         |
-//    /// |{@linkplain}  | 1.4         |
-//    /// |{@literal}    | 1.5         |
-//    /// |{@value}      | 1.4         |
-//    /// +--------------+-------------+
-//    ///
-//    func injected(to markup: SwiftMarkupOutput) -> SwiftMarkupOutput {
-//        var callout: Callout
-//        switch name {
-//        case "code":
-//            break
-//        case "docRoot":
-//            break
-//        case "inheritDoc":
-//            break
-//        case "link":
-//            break
-//        case "linkplain":
-//            break
-//        case "literal":
-//            break
-//        case "value":
-//            break
-//        default:
-//            break
-//        }
-//        return markup
-//    }
-//}
 
