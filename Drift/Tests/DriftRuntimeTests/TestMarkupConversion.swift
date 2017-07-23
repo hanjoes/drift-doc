@@ -34,10 +34,10 @@ public static func noop(param: Int) {
         let expected =
 """
 
-  Noop.
+Noop.
 
-  - Parameter: param some parameter.
- 
+- Parameter: param some parameter.
+
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -57,10 +57,10 @@ public static func noop(param: Int) -> Void {
         let expected =
 """
 
-  Noop.
+Noop.
 
-  - Returns: returning nothing.
- 
+- Returns: returning nothing.
+
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -82,7 +82,7 @@ public static func noop(param: Int) -> Void {
 //
     func testMarkupConversionThrows() {
         let file =
-        """
+"""
 /**
  *  Noop.
  *
@@ -94,10 +94,41 @@ public static func noop(param: Int) throws -> Void {
         let expected =
 """
 
-  Noop.
+Noop.
 
-  - Throws: some exception
- 
+- Throws: some exception
+
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMarkupMixedSections() {
+        let file =
+"""
+/**
+ *  Noop.
+ *
+ *  @return void
+ *  @throws some exception
+ *  @param param dorky parameter
+ *  @param param dorky parameter brother
+ *  @throws exception2
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+"""
+
+Noop.
+
+- Parameter param: dorky parameter
+- Parameter param: dorky parameter brother
+- Throws: some exception
+- Throws: exception2
+- Returns void
+
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
