@@ -5,21 +5,6 @@ class TestMarkupConversion: XCTestCase {
     
     let converter = DriftConverter()
     
-    /// test Swift markup conversion for author tag.
-//    func testMarkupConversionAuthor() {
-//        let file = Resources.sample5
-//        let expected =
-//"""
-//
-// *  Noop.
-// *
-// *  - Author: hanjoes
-//
-//"""
-//        let actual = converter.emitSwiftComments(for: file)
-//        XCTAssertEqual(expected, actual)
-//    }
-    
     func testMarkupConversionParameter() {
         let file =
 """
@@ -65,21 +50,7 @@ Noop.
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
     }
-//
-//    func testMarkupConversionSince() {
-//        let file = Resources.sample8
-//        let expected =
-//"""
-//
-// *  Noop.
-// *
-// *  - Since: first introduced in end of time.
-//
-//"""
-//        let actual = converter.emitSwiftComments(for: file)
-//        XCTAssertEqual(expected, actual)
-//    }
-//
+        
     func testMarkupConversionThrows() {
         let file =
 """
@@ -110,7 +81,7 @@ Noop.
  *  Noop.
  *
  *  @return void
- *  @throws some exception
+ *  @exception some exception
  *  @param param dorky parameter
  *  @param param dorky parameter brother
  *  @throws exception2
@@ -133,18 +104,78 @@ Noop.
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
     }
-//
-//    func testMarkupConversionVersion() {
-//        let file = Resources.sample10
-//        let expected =
-//"""
-//
-// *  Noop.
-// *
-// *  - Version: version 3.1415926
-//
-//"""
-//        let actual = converter.emitSwiftComments(for: file)
-//        XCTAssertEqual(expected, actual)
-//    }
+    
+    func testMarkupAuthorAndParameter() {
+        let file =
+"""
+/**
+ *  Noop.
+ *
+ *  @return void
+ *  @throws some exception
+ *  @author hanjoes
+ *  @param param dorky parameter
+ *  @param param dorky parameter brother
+ *  @throws exception2
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+"""
+
+Noop.
+
+- Author: hanjoes
+- Parameter param: dorky parameter
+- Parameter param: dorky parameter brother
+- Throws: some exception
+- Throws: exception2
+- Returns: void
+
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testMixedInlineAndDedicatedCallouts() {
+        let file =
+"""
+/**
+ *  Noop.
+ *  Comment line1.
+ *
+ *
+ *  @version 3.14159
+ *  @return void
+ *  @throws some exception
+ *  @author hanjoes
+ *  @param param dorky parameter
+ *  @param param dorky parameter brother
+ *  @since epoch
+ *  @throws exception2
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+"""
+
+Noop.
+Comment line1.
+
+
+- Version: 3.14159
+- Author: hanjoes
+- Since: epoch
+- Parameter param: dorky parameter
+- Parameter param: dorky parameter brother
+- Throws: some exception
+- Throws: exception2
+- Returns: void
+
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
 }

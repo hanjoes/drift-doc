@@ -22,6 +22,9 @@ extension Javadoc: SwiftMarkupConvertible {
             else if childMarkup is Throws {
                 resultModel.throwsSection.append(childMarkup)
             }
+            else if childMarkup is InlineCallout {
+                resultModel.descriptionSection.append(childMarkup)
+            }
             else if childMarkup is SwiftMarkupDescription {
                 resultModel.descriptionSection.append(childMarkup)
             }
