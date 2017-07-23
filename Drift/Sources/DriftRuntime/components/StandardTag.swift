@@ -65,9 +65,6 @@ extension StandardTag {
         default:
             return SwiftMarkupDescription.text(children.map{$0.markup.description}.joined(separator: ""))
         }
-    //        case "deprecated":
-    //            break
-    //        case "see":
     }
 }
 

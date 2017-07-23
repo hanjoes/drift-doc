@@ -197,6 +197,8 @@ Comment line1.
  *
  *
  *  @version 3.14159
+ *  @serial "json" encoded
+ *  @deprecated this API should not be used 
  *  @return void
  *  @throws some exception {@code TestException} should never be thrown.
  *  @author hanjoes
@@ -212,6 +214,8 @@ Comment line1. `some code` is working!
 
 
 - Version: 3.14159
+"json" encoded
+this API should not be used
 - Author: hanjoes
 - Throws: some exception `TestException` should never be thrown.
 - Returns: void
