@@ -5,6 +5,7 @@ class TestMarkupConversion: XCTestCase {
     
     let converter = DriftConverter()
     
+    /// ------------------------------------------------
     func testMarkupConversionParameter() {
         let file =
 """
@@ -28,6 +29,7 @@ Noop.
         XCTAssertEqual(expected, actual)
     }
     
+    /// ------------------------------------------------
     func testMarkupConversionReturns() {
         let file =
 """
@@ -51,6 +53,7 @@ Noop.
         XCTAssertEqual(expected, actual)
     }
         
+    /// ------------------------------------------------
     func testMarkupConversionThrows() {
         let file =
 """
@@ -74,6 +77,7 @@ Noop.
         XCTAssertEqual(expected, actual)
     }
     
+    /// ------------------------------------------------
     func testMarkupMixedSections() {
         let file =
 """
@@ -105,6 +109,7 @@ Noop.
         XCTAssertEqual(expected, actual)
     }
     
+    /// ------------------------------------------------
     func testMarkupAuthorAndParameter() {
         let file =
 """
@@ -138,6 +143,7 @@ Noop.
         XCTAssertEqual(expected, actual)
     }
     
+    /// ------------------------------------------------
     func testMixedInlineAndDedicatedCallouts() {
         let file =
 """
@@ -172,6 +178,40 @@ Comment line1.
 - Parameter param: dorky parameter brother
 - Throws: some exception
 - Throws: exception2
+- Returns: void
+
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    /// ------------------------------------------------
+    func testMixedCalloutsWithCodeVoiceEmbedded() {
+        let file =
+        """
+/**
+ *  Noop.
+ *  Comment line1. {@code some code} is working!
+ *
+ *
+ *  @version 3.14159
+ *  @return void
+ *  @throws some exception {@code TestException} should never be thrown.
+ *  @author hanjoes
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+        """
+
+Noop.
+Comment line1. `some code` is working!
+
+
+- Version: 3.14159
+- Author: hanjoes
+- Throws: some exception `TestException` should never be thrown.
 - Returns: void
 
 """

@@ -20,8 +20,19 @@ extension InlineTag {
 }
 
 extension InlineTag {
+    var childrenMarkups: [SwiftMarkupOutputModel] {
+        return children.map {
+            $0.markup
+        }
+    }
+
     var markup: SwiftMarkupOutputModel {
-        return SwiftMarkupDescription.text(children.map{$0.description}.joined(separator: ""))
+        switch name {
+        case "code":
+            return CodeVoice(childrenMarkups: childrenMarkups)
+        default:
+            return SwiftMarkupDescription.text(children.map{$0.description}.joined(separator: ""))
+        }
     }
 }
 //
