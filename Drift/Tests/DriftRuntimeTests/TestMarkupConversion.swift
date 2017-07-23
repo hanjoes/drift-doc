@@ -36,7 +36,7 @@ public static func noop(param: Int) {
 
 Noop.
 
-- Parameter: param some parameter.
+- Parameter param: some parameter.
 
 """
         let actual = converter.emitSwiftComments(for: file)
@@ -127,7 +127,7 @@ Noop.
 - Parameter param: dorky parameter brother
 - Throws: some exception
 - Throws: exception2
-- Returns void
+- Returns: void
 
 """
         let actual = converter.emitSwiftComments(for: file)
