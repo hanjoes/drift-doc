@@ -42,12 +42,12 @@ extension InlineTag {
     var markup: SwiftMarkupOutputModel {
 //        case "link":
 //            break
-//        case "literal":
-//            break
 //        case "value":
 //            break
         switch name {
-        case "code":
+        case "code": fallthrough
+        case "literal":
+            // FIXME: Content here should be handled as-is.
             return CodeVoice(childrenMarkups: childrenMarkups)
         default:
             return SwiftMarkupDescription.text(children.map{$0.description}.joined(separator: ""))

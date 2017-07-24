@@ -200,7 +200,7 @@ Comment line1.
  *  @serial "json" encoded
  *  @deprecated this API should not be used 
  *  @return void
- *  @throws some exception {@code TestException} should never be thrown.
+ *  @throws some exception {@code TestException} should {@literal never be thrown.}
  *  @author hanjoes
  */
 public static func noop(param: Int) throws -> Void {
@@ -217,7 +217,7 @@ Comment line1. `some code` is working!
 "json" encoded
 this API should not be used
 - Author: hanjoes
-- Throws: some exception `TestException` should never be thrown.
+- Throws: some exception `TestException` should `never be thrown.`
 - Returns: void
 
 """
