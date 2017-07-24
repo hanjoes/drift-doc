@@ -156,7 +156,7 @@ Noop.
  *  @return void
  *  @throws some exception
  *  @author hanjoes
- *  @param param dorky parameter
+ *  @param param dorky parameter {@link ParameterType#type}
  *  @param param dorky parameter brother
  *  @since epoch
  *  @throws exception2
@@ -176,7 +176,7 @@ Comment line1.
 - Author: hanjoes
 - Since: epoch
 - SeeAlso: some other code
-- Parameter param: dorky parameter
+- Parameter param: dorky parameter _ParameterType#type_
 - Parameter param: dorky parameter brother
 - Throws: some exception
 - Throws: exception2

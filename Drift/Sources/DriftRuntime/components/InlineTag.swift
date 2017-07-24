@@ -27,7 +27,6 @@ extension InlineTag {
         }
     }
 
-
     /// Available Javadoc inline tags.
     /// only few of them are supported in this implementation.
     /// +--------------+-------------+
@@ -40,15 +39,13 @@ extension InlineTag {
     /// |{@value}      | 1.4         |
     /// +--------------+-------------+
     var markup: SwiftMarkupOutputModel {
-//        case "link":
-//            break
-//        case "value":
-//            break
         switch name {
         case "code": fallthrough
         case "literal":
             // FIXME: Content here should be handled as-is.
             return CodeVoice(childrenMarkups: childrenMarkups)
+        case "link":
+            return Italic(childrenMarkups: childrenMarkups)
         default:
             return SwiftMarkupDescription.text(children.map{$0.description}.joined(separator: ""))
         }
