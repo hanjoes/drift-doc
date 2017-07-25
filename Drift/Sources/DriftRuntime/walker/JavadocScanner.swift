@@ -7,7 +7,7 @@ class JavadocScanner: JavadocParserBaseListener {
     var docs = [Javadoc]()
     
     override func enterJavadoc(_ ctx: JavadocParser.JavadocContext) {
-        enclosingComponent = Javadoc()
+        enclosingComponent = Javadoc(range: ctx.getStart()!.getStartIndex()...ctx.getStop()!.getStopIndex())
     }
     
     override func exitJavadoc(_ ctx: JavadocParser.JavadocContext) {

@@ -15,6 +15,7 @@ public struct DriftConverter {
 }
 
 extension DriftConverter {
+    
     func emitJavaDocs(for content: String) -> [Javadoc] {
         let input = ANTLRInputStream(content)
         let lexer = JavadocLexer(input)
@@ -25,6 +26,7 @@ extension DriftConverter {
             guard let _ = try? walker.walk(scanner, parser.file()) else {
                 return [Javadoc]()
             }
+            
             return scanner.docs
         }
         return [Javadoc]()
@@ -32,7 +34,9 @@ extension DriftConverter {
     
     func emitSwiftComments(for content: String) -> String {
         return self.emitJavaDocs(for: content).map {
-            return $0.markup.description
-        }.joined(separator: "")
+            $0.markup.description
+        }.joined(separator: "").split(separator: "\n", maxSplits: Int.max, omittingEmptySubsequences: false).map {
+            "/// \($0)"
+        }.joined(separator: "\n")
     }
 }

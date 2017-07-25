@@ -19,11 +19,11 @@ public static func noop(param: Int) {
 """
         let expected =
 """
-
-Noop.
-
-- Parameter param: some parameter.
-
+/// 
+/// Noop.
+/// 
+/// - Parameter param: some parameter.
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -43,11 +43,11 @@ public static func noop(param: Int) -> Void {
 """
         let expected =
 """
-
-Noop.
-
-- Returns: returning nothing.
-
+/// 
+/// Noop.
+/// 
+/// - Returns: returning nothing.
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -67,11 +67,11 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-
-- Throws: some exception
-
+/// 
+/// Noop.
+/// 
+/// - Throws: some exception
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -95,15 +95,15 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-
-- Parameter param: dorky parameter
-- Parameter param: dorky parameter brother
-- Throws: some exception
-- Throws: exception2
-- Returns: void
-
+/// 
+/// Noop.
+/// 
+/// - Parameter param: dorky parameter
+/// - Parameter param: dorky parameter brother
+/// - Throws: some exception
+/// - Throws: exception2
+/// - Returns: void
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -128,16 +128,16 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-
-- Author: hanjoes
-- Parameter param: dorky parameter
-- Parameter param: dorky parameter brother
-- Throws: some exception
-- Throws: exception2
-- Returns: void
-
+/// 
+/// Noop.
+/// 
+/// - Author: hanjoes
+/// - Parameter param: dorky parameter
+/// - Parameter param: dorky parameter brother
+/// - Throws: some exception
+/// - Throws: exception2
+/// - Returns: void
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -167,21 +167,21 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-Comment line1.
-
-
-- Version: 3.14159
-- Author: hanjoes
-- Since: epoch
-- SeeAlso: some other code
-- Parameter param: dorky parameter _ParameterType#type_
-- Parameter param: dorky parameter brother
-- Throws: some exception
-- Throws: exception2
-- Returns: void
-
+/// 
+/// Noop.
+/// Comment line1.
+/// 
+/// 
+/// - Version: 3.14159
+/// - Author: hanjoes
+/// - Since: epoch
+/// - SeeAlso: some other code
+/// - Parameter param: dorky parameter _ParameterType#type_
+/// - Parameter param: dorky parameter brother
+/// - Throws: some exception
+/// - Throws: exception2
+/// - Returns: void
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -208,18 +208,18 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-Comment line1. `some code` is working!
-
-
-- Version: 3.14159
-"json" encoded
-this API should not be used
-- Author: hanjoes
-- Throws: some exception `TestException` should `never be thrown.`
-- Returns: void
-
+/// 
+/// Noop.
+/// Comment line1. `some code` is working!
+/// 
+/// 
+/// - Version: 3.14159
+/// "json" encoded
+/// this API should not be used
+/// - Author: hanjoes
+/// - Throws: some exception `TestException` should `never be thrown.`
+/// - Returns: void
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)
@@ -258,27 +258,27 @@ public static func noop(param: Int) throws -> Void {
 """
         let expected =
 """
-
-Noop.
-Comment line1. `some code` is working!
-
-
-- Version: 3.14159
-"json" encoded
-this API should not be used
-- Author: hanjoes
-- Throws: some exception `TestException` should `never be thrown.`
-- Returns: void
-
-Noop.
-
-- Author: hanjoes
-- Parameter param: dorky parameter
-- Parameter param: dorky parameter brother
-- Throws: some exception
-- Throws: exception2
-- Returns: void
-
+/// 
+/// Noop.
+/// Comment line1. `some code` is working!
+/// 
+/// 
+/// - Version: 3.14159
+/// "json" encoded
+/// this API should not be used
+/// - Author: hanjoes
+/// - Throws: some exception `TestException` should `never be thrown.`
+/// - Returns: void
+/// 
+/// Noop.
+/// 
+/// - Author: hanjoes
+/// - Parameter param: dorky parameter
+/// - Parameter param: dorky parameter brother
+/// - Throws: some exception
+/// - Throws: exception2
+/// - Returns: void
+/// 
 """
         let actual = converter.emitSwiftComments(for: file)
         XCTAssertEqual(expected, actual)

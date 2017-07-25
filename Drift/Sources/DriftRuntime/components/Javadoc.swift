@@ -3,8 +3,15 @@ import Foundation
 struct Javadoc: ParentComponent {
     var children: [DocComponent] = [DocComponent]()
     
+    var range: ClosedRange<Int>
+    
     /// Parent component of Javadoc is always nil.
     var parentComponent: ParentComponent? = nil
+    
+    init(range: ClosedRange<Int>) {
+        print(range)
+        self.range = range
+    }
 }
 
 extension Javadoc: SwiftMarkupConvertible {
