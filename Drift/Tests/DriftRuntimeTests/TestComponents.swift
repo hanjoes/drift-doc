@@ -80,7 +80,7 @@ class TestComponents: XCTestCase {
         let parseTree = try! parser.file()
         let scanner = JavadocScanner()
         if let _ = try? walker.walk(scanner, parseTree) {
-            XCTAssertEqual(expected, scanner.root.description)
+            XCTAssertEqual(expected, scanner.docs.map { $0.description }.joined(separator: ""))
         }
     }
 

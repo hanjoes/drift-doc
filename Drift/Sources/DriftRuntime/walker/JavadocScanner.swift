@@ -4,14 +4,14 @@ class JavadocScanner: JavadocParserBaseListener {
     
     var enclosingComponent: ParentComponent! = nil
     
-    var root: Javadoc!
+    var docs = [Javadoc]()
     
     override func enterJavadoc(_ ctx: JavadocParser.JavadocContext) {
         enclosingComponent = Javadoc()
     }
     
     override func exitJavadoc(_ ctx: JavadocParser.JavadocContext) {
-        root = enclosingComponent as! Javadoc
+        docs.append(enclosingComponent as! Javadoc)
     }
     
     override func enterHtml_element(_ ctx: JavadocParser.Html_elementContext) {

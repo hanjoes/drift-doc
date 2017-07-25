@@ -190,7 +190,7 @@ Comment line1.
     /// ------------------------------------------------
     func testMixedCalloutsWithCodeVoiceEmbedded() {
         let file =
-        """
+"""
 /**
  *  Noop.
  *  Comment line1. {@code some code} is working!
@@ -207,7 +207,7 @@ public static func noop(param: Int) throws -> Void {
 }
 """
         let expected =
-        """
+"""
 
 Noop.
 Comment line1. `some code` is working!
@@ -218,6 +218,65 @@ Comment line1. `some code` is working!
 this API should not be used
 - Author: hanjoes
 - Throws: some exception `TestException` should `never be thrown.`
+- Returns: void
+
+"""
+        let actual = converter.emitSwiftComments(for: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    /// ------------------------------------------------
+    func testMoreThanOneCommentBlock() {
+        let file =
+"""
+/**
+ *  Noop.
+ *  Comment line1. {@code some code} is working!
+ *
+ *
+ *  @version 3.14159
+ *  @serial "json" encoded
+ *  @deprecated this API should not be used
+ *  @return void
+ *  @throws some exception {@code TestException} should {@literal never be thrown.}
+ *  @author hanjoes
+ */
+public static func noop(param: Int) throws -> Void {
+}
+/**
+ *  Noop.
+ *
+ *  @return void
+ *  @throws some exception
+ *  @author hanjoes
+ *  @param param dorky parameter
+ *  @param param dorky parameter brother
+ *  @throws exception2
+ */
+public static func noop(param: Int) throws -> Void {
+}
+"""
+        let expected =
+"""
+
+Noop.
+Comment line1. `some code` is working!
+
+
+- Version: 3.14159
+"json" encoded
+this API should not be used
+- Author: hanjoes
+- Throws: some exception `TestException` should `never be thrown.`
+- Returns: void
+
+Noop.
+
+- Author: hanjoes
+- Parameter param: dorky parameter
+- Parameter param: dorky parameter brother
+- Throws: some exception
+- Throws: exception2
 - Returns: void
 
 """
