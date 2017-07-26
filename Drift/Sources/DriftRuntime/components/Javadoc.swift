@@ -9,7 +9,6 @@ struct Javadoc: ParentComponent {
     var parentComponent: ParentComponent? = nil
     
     init(range: ClosedRange<Int>) {
-        print(range)
         self.range = range
     }
 }

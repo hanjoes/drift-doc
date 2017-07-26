@@ -6,7 +6,7 @@ class TestMarkupConversion: XCTestCase {
     let converter = DriftConverter()
     
     /// ------------------------------------------------
-    func testMarkupConversionParameter() {
+    func testMarkupConversionParameter() throws {
         let file =
 """
 /**
@@ -24,13 +24,15 @@ public static func noop(param: Int) {
 /// 
 /// - Parameter param: some parameter.
 /// 
+public static func noop(param: Int) {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMarkupConversionReturns() {
+    func testMarkupConversionReturns() throws {
         let file =
 """
 /**
@@ -48,13 +50,15 @@ public static func noop(param: Int) -> Void {
 /// 
 /// - Returns: returning nothing.
 /// 
+public static func noop(param: Int) -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
         
     /// ------------------------------------------------
-    func testMarkupConversionThrows() {
+    func testMarkupConversionThrows() throws {
         let file =
 """
 /**
@@ -72,13 +76,15 @@ public static func noop(param: Int) throws -> Void {
 /// 
 /// - Throws: some exception
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMarkupMixedSections() {
+    func testMarkupMixedSections() throws {
         let file =
 """
 /**
@@ -104,13 +110,15 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: exception2
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMarkupAuthorAndParameter() {
+    func testMarkupAuthorAndParameter() throws {
         let file =
 """
 /**
@@ -138,13 +146,15 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: exception2
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMixedInlineAndDedicatedCallouts() {
+    func testMixedInlineAndDedicatedCallouts() throws {
         let file =
 """
 /**
@@ -182,13 +192,15 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: exception2
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMixedCalloutsWithCodeVoiceEmbedded() {
+    func testMixedCalloutsWithCodeVoiceEmbedded() throws {
         let file =
 """
 /**
@@ -220,13 +232,15 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: some exception `TestException` should `never be thrown.`
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
     /// ------------------------------------------------
-    func testMoreThanOneCommentBlock() {
+    func testMoreThanOneCommentBlock() throws {
         let file =
 """
 /**
@@ -270,6 +284,9 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: some exception `TestException` should `never be thrown.`
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
+/// 
 /// Noop.
 /// 
 /// - Author: hanjoes
@@ -279,8 +296,10 @@ public static func noop(param: Int) throws -> Void {
 /// - Throws: exception2
 /// - Returns: void
 /// 
+public static func noop(param: Int) throws -> Void {
+}
 """
-        let actual = converter.emitSwiftComments(for: file)
+        let actual = try converter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
 }
