@@ -3,32 +3,17 @@ import Antlr4
 
 public struct DriftConverter {
     
-    /// Emit Swift-style comment string from a file
-    /// contains JAVA-style comments.
-    ///
-    /// - Parameter path: path to the file
-    /// - Returns: the file content with only Swift-style comments.
-    public func emitSwiftyComments(for file: URL) -> String {
-        return ""
+    /// Prevent from using initializer.
+    private init() {
     }
     
-}
-
-extension DriftConverter {
-    
-    func makeANTLRTokenStream(from content: String) -> TokenStream {
-        let input = ANTLRInputStream(content)
-        let lexer = JavadocLexer(input)
-        return CommonTokenStream(lexer)
-    }
-    
-    func rewrite(content: String) throws -> String {
+    public static func rewrite(content: String) throws -> String {
         let input = ANTLRInputStream(content)
         let lexer = JavadocLexer(input)
         let tokens = CommonTokenStream(lexer)
         try tokens.fill()
         let rewriter = TokenStreamRewriter(tokens)
-        let javadocs = emitJavaDocs(for: content)
+        let javadocs = emitJavaDocs(from: tokens)
         try javadocs.forEach {
             let range = $0.range
             let markupDesc = $0.markup.description
@@ -39,8 +24,17 @@ extension DriftConverter {
         return try rewriter.getText()
     }
     
-    func emitJavaDocs(for content: String) -> [Javadoc] {
-        let tokens = makeANTLRTokenStream(from: content)
+}
+
+private extension DriftConverter {
+    
+    static func makeANTLRTokenStream(from content: String) -> TokenStream {
+        let input = ANTLRInputStream(content)
+        let lexer = JavadocLexer(input)
+        return CommonTokenStream(lexer)
+    }
+    
+    static func emitJavaDocs(from tokens: TokenStream) -> [Javadoc] {
         if let parser = try? JavadocParser(tokens) {
             let scanner = JavadocScanner()
             let walker = ParseTreeWalker()
@@ -51,13 +45,5 @@ extension DriftConverter {
             return scanner.docs
         }
         return [Javadoc]()
-    }
-    
-    func emitSwiftComments(for content: String) -> String {
-        return self.emitJavaDocs(for: content).map {
-            $0.markup.description
-        }.joined(separator: "").split(separator: "\n", maxSplits: Int.max, omittingEmptySubsequences: false).map {
-            "/// \($0)"
-        }.joined(separator: "\n")
     }
 }

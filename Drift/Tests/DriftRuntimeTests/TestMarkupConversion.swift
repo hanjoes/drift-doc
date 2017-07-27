@@ -3,8 +3,6 @@ import XCTest
 
 class TestMarkupConversion: XCTestCase {
     
-    let converter = DriftConverter()
-    
     /// ------------------------------------------------
     func testMarkupConversionParameter() throws {
         let file =
@@ -27,7 +25,7 @@ public static func noop(param: Int) {
 public static func noop(param: Int) {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -53,7 +51,7 @@ public static func noop(param: Int) -> Void {
 public static func noop(param: Int) -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
         
@@ -79,7 +77,7 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -113,7 +111,7 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -149,7 +147,7 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -195,7 +193,7 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -235,7 +233,7 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
     
@@ -299,7 +297,24 @@ public static func noop(param: Int) throws -> Void {
 public static func noop(param: Int) throws -> Void {
 }
 """
-        let actual = try converter.rewrite(content: file)
+        let actual = try DriftConverter.rewrite(content: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testIndentedJavadoc() throws {
+        let file =
+"""
+    /**
+     * The type of a {@link org.antlr.v4.runtime.atn.LexerSkipAction} action.
+     */
+"""
+        let expected =
+"""
+    /// 
+    /// The type of a _org.antlr.v4.runtime.atn.LexerSkipAction_ action.
+    /// 
+"""
+        let actual = try DriftConverter.rewrite(content: file)
         XCTAssertEqual(expected, actual)
     }
 }
