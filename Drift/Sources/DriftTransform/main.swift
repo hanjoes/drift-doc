@@ -1,10 +1,6 @@
 import DriftRuntime
 import Foundation
 
-/// Main entrance.
-///
-/// - Parameter arguments: arguments passed by commandline.
-/// - Throws: any error when handling the input
 func main(_ arguments: [String]) throws {
     if arguments.count != 3 {
         printUsage()
@@ -68,6 +64,7 @@ func transform(file: String, backupTo dir: String) throws {
         return
     }
     
+    // Need to truncate in case converted file is smaller.
     wfd.truncateFile(atOffset: 0)
     wfd.write(outputData)
 }
