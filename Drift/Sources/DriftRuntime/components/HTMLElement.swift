@@ -21,6 +21,6 @@ extension HTMLElement {
 // MARK: SwiftMarkupConvertible
 extension HTMLElement {
     var markup: SwiftMarkupOutputModel {
-        return SwiftMarkupDescription.text(content)
+        return SwiftMarkupDescription.text("")
     }
 }
