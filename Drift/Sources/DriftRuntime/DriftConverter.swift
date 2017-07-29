@@ -8,7 +8,7 @@ public struct DriftConverter {
     }
     
     public static func rewrite(content: String) throws -> String {
-        let input = ANTLRInputStream(content)
+        let input = ANTLRInputStream(Preprocess.convertComment(in: content))
         let lexer = JavadocLexer(input)
         let tokens = CommonTokenStream(lexer)
         try tokens.fill()
@@ -21,12 +21,24 @@ public struct DriftConverter {
             var indent = ""
             if let hiddenTokens = try tokens.getHiddenTokensToLeft(range.lowerBound) {
                 if hiddenTokens.count > 0 {
-                    indent = hiddenTokens.first!.getText()!.replacingOccurrences(of: "\n", with: "")
+                    let hidden = hiddenTokens.first!.getText()!
+                    let lines = hidden.split(separator: "\n", maxSplits: Int.max, omittingEmptySubsequences: false)
+                    indent = String(lines.last!)
                 }
             }
-            let replacement = markupLines.map { "\(indent)/// \($0)" }.joined(separator: "\n")
-            let replacingLowerBound = range.lowerBound - (indent.count == 0 ? 0 : 1)
-            try rewriter.replace(replacingLowerBound, range.upperBound, replacement)
+            var index = 0
+            var replacementLines = [String]()
+            while index < markupLines.count {
+                if index == 0 {
+                    replacementLines.append("/// \(markupLines[index])")
+                }
+                else {
+                    replacementLines.append("\(indent)/// \(markupLines[index])")
+                }
+                index += 1
+            }
+            let replacement = replacementLines.joined(separator: "\n")
+            try rewriter.replace(range.lowerBound, range.upperBound, replacement)
         }
         return try rewriter.getText()
     }

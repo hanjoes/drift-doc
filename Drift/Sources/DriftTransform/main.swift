@@ -40,6 +40,7 @@ func main(_ arguments: [String]) throws {
 /// - Parameter dir: directory stores backup files
 /// - Throws: exception from DriftConverter
 func transform(file: String, backupTo dir: String) throws {
+    print("Attempting to transform file: \(file) and backup to :\(dir)")
     guard let rfd = FileHandle(forReadingAtPath: file) else {
         print("Creating read fd for: \(file) failed.")
         return
@@ -80,6 +81,7 @@ func transformAll(under path: String, backupTo dir: String) throws {
     
     var isDir: ObjCBool = false
     guard fm.fileExists(atPath: path, isDirectory: &isDir) else {
+        print("Path: \(path) doesn't exist.")
         return
     }
     
@@ -87,7 +89,7 @@ func transformAll(under path: String, backupTo dir: String) throws {
         let contents = try fm.contentsOfDirectory(atPath: path)
         for content in contents {
             // FIXME: cannot have file of same name under different dir
-            try transformAll(under: content, backupTo: dir)
+            try transformAll(under: "\(path)/\(content)", backupTo: dir)
         }
     }
     else {
