@@ -18,8 +18,15 @@ public struct DriftConverter {
             let range = $0.range
             let markupDesc = $0.markup.description
             let markupLines = markupDesc.split(separator: "\n", maxSplits: Int.max, omittingEmptySubsequences: false)
-            let replacement = markupLines.map { "/// \($0)" }.joined(separator: "\n")
-            try rewriter.replace(range.lowerBound, range.upperBound, replacement)
+            var indent = ""
+            if let hiddenTokens = try tokens.getHiddenTokensToLeft(range.lowerBound) {
+                if hiddenTokens.count > 0 {
+                    indent = hiddenTokens.first!.getText()!.replacingOccurrences(of: "\n", with: "")
+                }
+            }
+            let replacement = markupLines.map { "\(indent)/// \($0)" }.joined(separator: "\n")
+            let replacingLowerBound = range.lowerBound - (indent.count == 0 ? 0 : 1)
+            try rewriter.replace(replacingLowerBound, range.upperBound, replacement)
         }
         return try rewriter.getText()
     }
