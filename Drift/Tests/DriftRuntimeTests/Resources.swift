@@ -301,37 +301,7 @@ open class ATNSimulator {
 
 """
     
-    static let sample5 =
+    let sample5 = 
 """
-/**
- *  Noop.
- *
- *  @author hanjoes
- */
-public static func noop() {
-}
-"""
-
-    
-    static let sample8 =
-"""
-/**
- *  Noop.
- *
- *  @since first introduced in end of time.
- */
-public static func noop(param: Int) -> Void {
-}
-"""
-    
-    static let sample10 =
-"""
-/**
- *  Noop.
- *
- *  @version version 3.1415926
- */
-public static func noop(param: Int) throws -> Void {
-}
 """
 }

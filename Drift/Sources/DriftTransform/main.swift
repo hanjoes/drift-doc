@@ -68,6 +68,7 @@ func transform(file: String, backupTo dir: String) throws {
         return
     }
     
+    wfd.truncateFile(atOffset: 0)
     wfd.write(outputData)
 }
 
