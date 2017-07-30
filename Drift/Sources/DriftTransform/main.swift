@@ -16,18 +16,18 @@ func main(_ arguments: [String]) throws {
         return
     }
     
-    let dest = arguments[2]
-    guard fm.fileExists(atPath: dest, isDirectory: &isDir) else {
-        print("Destination: \(dest) does not exist.")
+    let backupDir = arguments[2]
+    guard fm.fileExists(atPath: backupDir, isDirectory: &isDir) else {
+        print("Backup directory: \(backupDir) does not exist.")
         return
     }
     
     guard isDir.boolValue else {
-        print("Destination: \(dest) is not directory.")
+        print("Backup directory: \(backupDir) is not directory.")
         return
     }
     
-    try transformAll(under: path, backupTo: dest)
+    try transformAll(under: path, backupTo: backupDir)
 }
 
 /// Transform one file.
@@ -101,7 +101,7 @@ func printUsage() {
 """
     DriftTransform: Transforms any document that contains Javadoc to Swift documentation.
 
-    Usage: DriftTransform <directory or file> <output directory>
+    Usage: DriftTransform <directory or file> <backup directory>
 
         The tool will detect the type of the second argument.
         If it's a directory, we will transform all files under the directory recursively.
