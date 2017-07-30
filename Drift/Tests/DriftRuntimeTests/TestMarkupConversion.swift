@@ -301,6 +301,19 @@ public static func noop(param: Int) throws -> Void {
         XCTAssertEqual(expected, actual)
     }
     
+    func testOneLineJavadoc() throws {
+        let file =
+"""
+    /** The type of a {@link org.antlr.v4.runtime.atn.LexerSkipAction} action. */
+"""
+        let expected =
+        """
+    /// The type of a _org.antlr.v4.runtime.atn.LexerSkipAction_ action.
+"""
+        let actual = try DriftConverter.rewrite(content: file)
+        XCTAssertEqual(expected, actual)
+    }
+    
     func testIndentedJavadoc() throws {
         let file =
 """
