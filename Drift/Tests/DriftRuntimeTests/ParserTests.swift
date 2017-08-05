@@ -13,25 +13,19 @@ class ParserTests: XCTestCase {
     fileprivate static var fileManager = FileManager.default
     
     fileprivate static let ResourceURL = "https://github.com/hanjoes/antlr4.git"
+
+    private let file = "/tmp/test-source/ATNDeserializer.swift"
     
     func testParsingWithNoError() throws {
-//        let inputFiles = ParserTests.findAllSwiftFiles(under: ParserTests.initializedRepoDir)
-//        print(inputFiles.joined(separator: "\n"))
-//        _ = try inputFiles.map {
-//            inputFile in
-//            print("handling \(inputFile)")
-            let fileStream = ANTLRFileStream("/tmp/drift-tests-22-22/repo//runtime/Swift/Sources/Antlr4/atn/ATNDeserializer.swift")
-            let lexer = Swift3Lexer(fileStream)
-            let tokenStream = CommonTokenStream(lexer)
-            let parser = try Swift3Parser(tokenStream)
-            let walker = ParseTreeWalker()
-//            try walker.walk(Swift3BaseListener(), parser.top_level())
-            let start = DispatchTime.now().uptimeNanoseconds
-            try parser.top_level()
-            let end = DispatchTime.now().uptimeNanoseconds
-            let spent = Double(end - start) / 1_000
-            print("Spent end \(end) - start \(start) = \(spent) usecs...")
-//        }
+        let fileStream = ANTLRFileStream(file)
+        let lexer = Swift3Lexer(fileStream)
+        let tokenStream = CommonTokenStream(lexer)
+        let parser = try Swift3Parser(tokenStream)
+        let start = DispatchTime.now().uptimeNanoseconds
+        try parser.top_level()
+        let end = DispatchTime.now().uptimeNanoseconds
+        let spent = Double(end - start) / 1_000
+        print("Spent end \(end) - start \(start) = \(spent) usecs...")
     }
     
 }
